@@ -7,7 +7,7 @@
   >
     <div class="bn__handle" aria-hidden="true"></div>
     <ul class="bn__list">
-      @for (item of itens; track item.key) {
+      @for (item of itensVisiveis(); track item.key) {
         <li>
           <a
             [routerLink]="item.route"

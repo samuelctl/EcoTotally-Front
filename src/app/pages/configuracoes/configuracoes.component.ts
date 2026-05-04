@@ -1,12 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, signal, OnInit } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 
 import { AuthService } from '../../core/auth.service';
-import { ThemeService, ThemeMode } from '../../core/theme.service';
-import { InsightsService } from '../../services/insights.service';
 import { describeError } from '../../core/http-helpers';
+import { ThemeMode, ThemeService } from '../../core/theme.service';
+import { InsightsService } from '../../services/insights.service';
 
 interface Prefs {
   notificacoes: boolean;
@@ -22,6 +22,8 @@ const LANG_LABELS: Record<string, Record<string, string>> = {
   'pt-BR': {
     settings: '⚙️ Configurações',
     subtitle: 'Personalize sua experiência no EcoTotally.',
+    profile: 'Perfil',
+    viewProfile: 'Ver meu perfil',
     appearance: '🎨 Aparência',
     light: 'Claro',
     dark: 'Escuro',
@@ -48,11 +50,14 @@ const LANG_LABELS: Record<string, Record<string, string>> = {
     themeUpdated: 'Tema atualizado.',
     reportDownloaded: 'Relatório baixado com sucesso.',
     cacheCleared: 'Cache limpo.',
-    confirmCache: 'Limpar dados em cache do app? Suas configurações serão mantidas, mas você pode precisar entrar de novo.',
+    confirmCache:
+      'Limpar dados em cache do app? Suas configurações serão mantidas, mas você pode precisar entrar de novo.',
   },
   'en-US': {
     settings: '⚙️ Settings',
     subtitle: 'Personalize your EcoTotally experience.',
+    profile: 'Profile',
+    viewProfile: 'View my profile',
     appearance: '🎨 Appearance',
     light: 'Light',
     dark: 'Dark',
@@ -79,11 +84,14 @@ const LANG_LABELS: Record<string, Record<string, string>> = {
     themeUpdated: 'Theme updated.',
     reportDownloaded: 'Report downloaded successfully.',
     cacheCleared: 'Cache cleared.',
-    confirmCache: 'Clear app cache? Your settings will be kept, but you may need to sign in again.',
+    confirmCache:
+      'Clear app cache? Your settings will be kept, but you may need to sign in again.',
   },
   'es-ES': {
     settings: '⚙️ Configuración',
     subtitle: 'Personaliza tu experiencia en EcoTotally.',
+    profile: 'Perfil',
+    viewProfile: 'Ver mi perfil',
     appearance: '🎨 Apariencia',
     light: 'Claro',
     dark: 'Oscuro',
@@ -110,7 +118,8 @@ const LANG_LABELS: Record<string, Record<string, string>> = {
     themeUpdated: 'Tema actualizado.',
     reportDownloaded: 'Informe descargado con éxito.',
     cacheCleared: 'Caché limpiada.',
-    confirmCache: '¿Limpiar caché de la app? Tu configuración se mantendrá, pero puede que tengas que iniciar sesión de nuevo.',
+    confirmCache:
+      '¿Limpiar caché de la app? Tu configuración se mantendrá, pero puede que tengas que iniciar sesión de nuevo.',
   },
 };
 
@@ -119,17 +128,22 @@ const LANG_LABELS: Record<string, Record<string, string>> = {
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './configuracoes.component.html',
-  styleUrls: ['./configuracoes.component.scss']
+  styleUrls: ['./configuracoes.component.scss'],
 })
 export class ConfiguracoesComponent implements OnInit {
   private auth = inject(AuthService);
   private router = inject(Router);
   private insights = inject(InsightsService);
+
   theme = inject(ThemeService);
 
   readonly versao = APP_VERSION;
-  readonly emailUsuario = computed(() => this.auth.getEmail() || this.auth.getUsuarioLocal()?.email || '—');
-  readonly nomeUsuario = computed(() => this.auth.getNome());
+
+  readonly emailUsuario = computed(
+    () => this.auth.getEmail() || this.auth.getUsuarioLocal()?.email || '—'
+  );
+
+  readonly nomeUsuario = computed(() => this.auth.getNome() || 'Usuário');
 
   prefs = signal<Prefs>(this.load());
 
@@ -157,17 +171,9 @@ export class ConfiguracoesComponent implements OnInit {
       localStorage.setItem(PREFS_KEY, JSON.stringify(next));
     } catch {}
 
-    if (key === 'idioma') {
-      this.applyLanguage(value as string);
-    }
-
-    if (key === 'reduzirAnimacoes') {
-      this.applyAnimations(value as boolean);
-    }
-
-    if (key === 'notificacoes') {
-      this.handleNotificationPref(value as boolean);
-    }
+    if (key === 'idioma') this.applyLanguage(value as string);
+    if (key === 'reduzirAnimacoes') this.applyAnimations(value as boolean);
+    if (key === 'notificacoes') this.handleNotificationPref(value as boolean);
   }
 
   async baixarRelatorio(): Promise<void> {
@@ -197,13 +203,8 @@ export class ConfiguracoesComponent implements OnInit {
     try {
       localStorage.clear();
 
-      if (prefs) {
-        localStorage.setItem(PREFS_KEY, prefs);
-      }
-
-      if (theme) {
-        localStorage.setItem('eco_theme_mode', theme);
-      }
+      if (prefs) localStorage.setItem(PREFS_KEY, prefs);
+      if (theme) localStorage.setItem('eco_theme_mode', theme);
     } catch {}
 
     this.flash(this.t()['cacheCleared'] ?? 'Cache limpo.');
@@ -236,7 +237,7 @@ export class ConfiguracoesComponent implements OnInit {
     if (!('Notification' in window)) return;
 
     if (Notification.permission === 'default') {
-      Notification.requestPermission().then(permission => {
+      Notification.requestPermission().then((permission) => {
         if (permission === 'granted') {
           new Notification('EcoTotally 🌱', {
             body: 'Alertas de consumo e metas ativados!',
@@ -274,7 +275,6 @@ export class ConfiguracoesComponent implements OnInit {
 
     try {
       const raw = localStorage.getItem(PREFS_KEY);
-
       if (!raw) return def;
 
       const parsed = JSON.parse(raw);

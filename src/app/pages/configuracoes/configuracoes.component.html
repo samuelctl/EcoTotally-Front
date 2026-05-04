@@ -8,11 +8,16 @@
       <div class="cfg-avatar">
         {{ (nomeUsuario()[0] || "U").toUpperCase() }}
       </div>
+
       <div>
         <strong>{{ nomeUsuario() }}</strong>
         <small>{{ emailUsuario() }}</small>
       </div>
     </header>
+
+    <button class="eco-btn eco-btn-ghost" type="button" routerLink="/perfil">
+      Ver meu perfil
+    </button>
   </div>
 
   <!-- Aparência -->
@@ -30,6 +35,7 @@
         <span class="cfg-theme-swatch cfg-theme-swatch--light"></span>
         {{ t()["light"] }}
       </button>
+
       <button
         type="button"
         class="cfg-theme-opt"
@@ -39,6 +45,7 @@
         <span class="cfg-theme-swatch cfg-theme-swatch--dark"></span>
         {{ t()["dark"] }}
       </button>
+
       <button
         type="button"
         class="cfg-theme-opt"
@@ -63,6 +70,7 @@
   <!-- Notificações -->
   <div class="eco-card cfg-card">
     <h2 class="cfg-title">{{ t()["notifications"] }}</h2>
+
     <label class="cfg-toggle">
       <input
         type="checkbox"
@@ -88,9 +96,10 @@
       <option value="es-ES">Español</option>
     </select>
 
-    <label class="eco-label" style="margin-top: 14px">{{
-      t()["energyUnit"]
-    }}</label>
+    <label class="eco-label" style="margin-top: 14px">
+      {{ t()["energyUnit"] }}
+    </label>
+
     <select
       class="eco-select"
       [value]="prefs().unidade"
@@ -146,12 +155,12 @@
 
       <li>
         <span>{{ t()["privacy"] }}</span>
-        <a routerLink="./privacidade">Ver</a>
+        <a routerLink="/privacidade">Ver</a>
       </li>
 
       <li>
         <span>{{ t()["terms"] }}</span>
-        <a routerLink="./termos">Ver</a>
+        <a routerLink="/termos">Ver</a>
       </li>
     </ul>
   </div>
@@ -159,6 +168,7 @@
   <!-- Conta — sair -->
   <div class="eco-card cfg-card">
     <h2 class="cfg-title">{{ t()["account"] }}</h2>
+
     <button class="eco-btn eco-btn-danger" type="button" (click)="sair()">
       {{ t()["logout"] }}
     </button>
@@ -167,6 +177,7 @@
   @if (msgOk()) {
     <div class="eco-success">{{ msgOk() }}</div>
   }
+
   @if (msgErro()) {
     <div class="eco-error">{{ msgErro() }}</div>
   }

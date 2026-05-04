@@ -2,99 +2,205 @@
   <header class="metas__header">
     <div>
       <h1 class="eco-h1">Metas</h1>
-      <p class="eco-subtitle">Defina limites de gastos e acompanhe o progresso em tempo real.</p>
+      <p class="eco-subtitle">
+        Defina limites de gastos e acompanhe o progresso em tempo real.
+      </p>
     </div>
-    <button type="button" class="metas__novo" (click)="abrirNova()" aria-label="Nova meta">+</button>
+
+    @if (!formAberto()) {
+      <button
+        type="button"
+        class="metas__novo"
+        (click)="abrirNova()"
+        aria-label="Nova meta"
+      >
+        +
+      </button>
+    }
   </header>
 
   @if (formAberto()) {
     <section class="eco-card metas__form eco-fade-in">
       <div class="metas__form-head">
-        <strong>{{ modoEdicao() ? 'Editar meta' : 'Nova meta' }}</strong>
-        <button type="button" class="metas__fechar" (click)="fecharForm()" aria-label="Fechar">×</button>
+        <strong>{{ modoEdicao() ? "Editar meta" : "Nova meta" }}</strong>
+
+        <button
+          type="button"
+          class="metas__fechar"
+          (click)="fecharForm()"
+          aria-label="Fechar formulário"
+        >
+          ×
+        </button>
       </div>
 
-      <div class="eco-row">
+      <div class="metas__grid">
         <div>
           <label class="eco-label" for="tipo-meta">Tipo</label>
-          <select id="tipo-meta" name="tipo-meta" class="eco-select" [(ngModel)]="tipoMeta">
-            @for (t of tipos; track t) { <option [value]="t">{{ t }}</option> }
+          <select
+            id="tipo-meta"
+            name="tipo-meta"
+            class="eco-select"
+            [(ngModel)]="tipoMeta"
+          >
+            @for (t of tipos; track t) {
+              <option [value]="t">{{ t }}</option>
+            }
           </select>
         </div>
+
         <div>
           <label class="eco-label" for="valor-obj">Valor objetivo (R$)</label>
-          <input id="valor-obj" name="valor-obj" class="eco-input" type="number" inputmode="decimal" step="0.01" min="0"
-                 [(ngModel)]="valorObjetivo" placeholder="0,00" />
+          <input
+            id="valor-obj"
+            name="valor-obj"
+            class="eco-input"
+            type="number"
+            inputmode="decimal"
+            step="0.01"
+            min="0"
+            [(ngModel)]="valorObjetivo"
+            placeholder="0,00"
+          />
         </div>
       </div>
 
-      <div class="eco-row" style="margin-top:14px;">
+      <div class="metas__grid metas__grid--dates">
         <div>
           <label class="eco-label" for="data-ini">Início</label>
-          <input id="data-ini" name="data-ini" class="eco-input" type="date" [(ngModel)]="dataInicio" />
+          <input
+            id="data-ini"
+            name="data-ini"
+            class="eco-input"
+            type="date"
+            [(ngModel)]="dataInicio"
+          />
         </div>
+
         <div>
           <label class="eco-label" for="data-fim">Fim</label>
-          <input id="data-fim" name="data-fim" class="eco-input" type="date" [(ngModel)]="dataFim" />
+          <input
+            id="data-fim"
+            name="data-fim"
+            class="eco-input"
+            type="date"
+            [(ngModel)]="dataFim"
+          />
         </div>
       </div>
 
-      @if (erro()) { <div class="eco-error">{{ erro() }}</div> }
+      @if (erro()) {
+        <div class="eco-error">{{ erro() }}</div>
+      }
 
-      <button type="button" class="eco-btn" style="margin-top:14px;" (click)="salvar()" [disabled]="salvando()">
-        @if (salvando()) { <span class="eco-spinner"></span> } @else { 💾 Salvar meta }
+      <button
+        type="button"
+        class="eco-btn metas__salvar"
+        (click)="salvar()"
+        [disabled]="salvando()"
+      >
+        @if (salvando()) {
+          <span class="eco-spinner"></span>
+        } @else {
+          💾 Salvar meta
+        }
       </button>
     </section>
   }
 
   @if (carregando() && metas().length === 0) {
-    <div class="eco-card" style="text-align:center;padding:30px;"><span class="eco-spinner lg"></span></div>
+    <div class="eco-card metas__loading">
+      <span class="eco-spinner lg"></span>
+    </div>
   } @else if (metasComProgresso().length === 0) {
     <div class="eco-card eco-empty">
-      Nenhuma meta criada ainda.<br>Crie a primeira no botão <strong>+</strong> 👆
+      Nenhuma meta criada ainda.<br />
+      Crie a primeira no botão <strong>+</strong> 👆
     </div>
   } @else {
     <ul class="metas__lista">
       @for (mp of metasComProgresso(); track mp.meta.id_meta) {
-        <li class="eco-card metas__card eco-fade-in" [attr.data-status]="mp.status">
+        <li
+          class="eco-card metas__card eco-fade-in"
+          [attr.data-status]="mp.status"
+        >
           <header class="metas__card-head">
-            <div class="metas__card-icone">{{ iconeTipo(mp.meta.tipo_meta) }}</div>
+            <div class="metas__card-icone">
+              {{ iconeTipo(mp.meta.tipo_meta) }}
+            </div>
+
             <div class="metas__card-info">
               <strong>{{ mp.meta.tipo_meta }}</strong>
-              <small>{{ mp.meta.data_inicio }} → {{ mp.meta.data_fim }} · {{ mp.diasRestantes }}d restantes</small>
+              <small>
+                {{ mp.meta.data_inicio }} → {{ mp.meta.data_fim }} ·
+                {{ mp.diasRestantes }}d restantes
+              </small>
             </div>
+
             <div class="metas__card-acoes">
-              <button type="button" class="metas__acao" (click)="abrirEdicao(mp.meta)" aria-label="Editar">✎</button>
-              <button type="button" class="metas__acao metas__acao--del" (click)="deletar(mp.meta)" aria-label="Excluir">×</button>
+              <button
+                type="button"
+                class="metas__acao"
+                (click)="abrirEdicao(mp.meta)"
+                aria-label="Editar meta"
+              >
+                ✎
+              </button>
+
+              <button
+                type="button"
+                class="metas__acao metas__acao--del"
+                (click)="deletar(mp.meta)"
+                aria-label="Excluir meta"
+              >
+                ×
+              </button>
             </div>
           </header>
 
           <div class="metas__valores">
             <span>
               <small>Acumulado</small>
-              <strong>R$ {{ mp.acumulado | number:'1.2-2' }}</strong>
+              <strong>R$ {{ mp.acumulado | number: "1.2-2" }}</strong>
             </span>
+
             <span class="metas__valores-sep">/</span>
+
             <span class="metas__valores-obj">
               <small>Objetivo</small>
-              <strong>R$ {{ mp.meta.valor_objetivo | number:'1.2-2' }}</strong>
+              <strong>
+                R$ {{ mp.meta.valor_objetivo | number: "1.2-2" }}
+              </strong>
             </span>
           </div>
 
           <div class="metas__progresso">
             <div class="metas__bar">
-              <div class="metas__bar-fill" [style.width.%]="mp.pct > 100 ? 100 : mp.pct"></div>
+              <div
+                class="metas__bar-fill"
+                [style.width.%]="mp.pct > 100 ? 100 : mp.pct"
+              ></div>
             </div>
-            <span class="metas__pct">{{ mp.pct | number:'1.0-0' }}%</span>
+
+            <span class="metas__pct">
+              {{ mp.pct | number: "1.0-0" }}%
+            </span>
           </div>
 
           <small class="metas__status">
-            @if (mp.status === 'estourada') {
-              ⚠️ Meta estourada em <strong>R$ {{ (mp.acumulado - +mp.meta.valor_objetivo) | number:'1.2-2' }}</strong>
-            } @else if (mp.status === 'atencao') {
-              🟡 Atenção: faltam <strong>R$ {{ mp.restante | number:'1.2-2' }}</strong> para o limite
+            @if (mp.status === "estourada") {
+              ⚠️ Meta estourada em
+              <strong>
+                R$
+                {{ mp.acumulado - +mp.meta.valor_objetivo | number: "1.2-2" }}
+              </strong>
+            } @else if (mp.status === "atencao") {
+              🟡 Atenção: faltam
+              <strong>R$ {{ mp.restante | number: "1.2-2" }}</strong>
+              para o limite
             } @else {
-              ✅ Dentro da meta — restam <strong>R$ {{ mp.restante | number:'1.2-2' }}</strong>
+              ✅ Dentro da meta — restam
+              <strong>R$ {{ mp.restante | number: "1.2-2" }}</strong>
             }
           </small>
         </li>
