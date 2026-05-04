@@ -1,12 +1,20 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { InsightsService, InsightsCompleto, RecomendacaoResponse } from '../../services/insights.service';
 import { describeError } from '../../core/http-helpers';
 
-interface BlocoIA {
-  tipo: 'titulo' | 'sub' | 'paragrafo' | 'item' | 'destaque';
-  texto: string;
+interface AnaliseIA {
+  diagnostico_geral: string;
+  alerta_amostra_regional: string;
+  nivel_urgencia: 'alto' | 'medio' | 'baixo';
+  economia_estimativa_mensal: number;
+  recomendacoes: {
+    titulo: string;
+    descricao: string;
+    categoria: string;
+    impacto: 'alto' | 'medio' | 'baixo';
+  }[];
 }
 
 @Component({
@@ -20,19 +28,13 @@ export class InsightsComponent implements OnInit {
   private svc = inject(InsightsService);
 
   dados = signal<InsightsCompleto | null>(null);
-  iaTexto = signal<string | null>(null);
+  iaObjeto = signal<AnaliseIA | null>(null);
   carregando = signal(true);
   carregandoIa = signal(false);
   erro = signal<string | null>(null);
 
   janelaMeses = signal(3);
   mesesProjetados = signal(3);
-
-  iaBlocos = computed<BlocoIA[]>(() => {
-    const t = this.iaTexto();
-    if (!t) return [];
-    return this.parseIA(t);
-  });
 
   ngOnInit(): void {
     this.carregar();
@@ -41,7 +43,7 @@ export class InsightsComponent implements OnInit {
   carregar(): void {
     this.carregando.set(true);
     this.erro.set(null);
-    this.iaTexto.set(null);
+    this.iaObjeto.set(null);
 
     this.svc.getProjecao(this.mesesProjetados(), this.janelaMeses()).subscribe({
       next: (d) => {
@@ -57,17 +59,11 @@ export class InsightsComponent implements OnInit {
 
   pedirIa(): void {
     if (this.carregandoIa()) return;
-
     this.carregandoIa.set(true);
 
     this.svc.getRecomendacaoIA(this.mesesProjetados(), this.janelaMeses()).subscribe({
       next: (r: RecomendacaoResponse) => {
-        const t =
-          typeof r.analise_ia === 'string'
-            ? r.analise_ia
-            : JSON.stringify(r.analise_ia, null, 2);
-
-        this.iaTexto.set(t);
+        this.iaObjeto.set(r.analise_ia as AnaliseIA);
         this.carregandoIa.set(false);
       },
       error: (err) => {
@@ -77,12 +73,10 @@ export class InsightsComponent implements OnInit {
     });
   }
 
-  // ✅ versão correta mantida (com download real + token)
   baixandoPdf = signal(false);
 
   async baixarRelatorio(): Promise<void> {
     if (this.baixandoPdf()) return;
-
     this.baixandoPdf.set(true);
     this.erro.set(null);
 
@@ -98,7 +92,6 @@ export class InsightsComponent implements OnInit {
   categorias(): { nome: string; info: { ultimo_mes: number; tendencia: string; total_projetado: number; crescimento_percentual: number } }[] {
     const d = this.dados();
     if (!d?.categorias) return [];
-
     return Object.keys(d.categorias).map((k) => ({
       nome: k,
       info: d.categorias[k]
@@ -122,74 +115,7 @@ export class InsightsComponent implements OnInit {
     }
   }
 
-  private parseIA(raw: string): BlocoIA[] {
-    const linhas = raw.replace(/\r\n/g, '\n').split('\n');
-    const blocos: BlocoIA[] = [];
-    let buffer: string[] = [];
-
-    const flush = () => {
-      const txt = buffer.join(' ').trim();
-      if (txt) {
-        blocos.push({
-          tipo: 'paragrafo',
-          texto: this.formatInline(txt)
-        });
-      }
-      buffer = [];
-    };
-
-    for (const linhaRaw of linhas) {
-      const linha = linhaRaw.trim();
-
-      if (!linha) {
-        flush();
-        continue;
-      }
-
-      const h = linha.match(/^(#{1,3})\s+(.+)$/);
-      if (h) {
-        flush();
-        const nivel = h[1].length;
-        blocos.push({
-          tipo: nivel === 1 ? 'titulo' : 'sub',
-          texto: this.formatInline(h[2])
-        });
-        continue;
-      }
-
-      const item = linha.match(/^[-*•]\s+(.+)$/);
-      if (item) {
-        flush();
-        blocos.push({
-          tipo: 'item',
-          texto: this.formatInline(item[1])
-        });
-        continue;
-      }
-
-      const destaque = linha.match(/^([⚡💧🔥⛽🌱📊💡✅⚠️🎯📈📉🔋])\s*(.+)$/);
-      if (destaque) {
-        flush();
-        blocos.push({
-          tipo: 'destaque',
-          texto: this.formatInline(`${destaque[1]} ${destaque[2]}`)
-        });
-        continue;
-      }
-
-      buffer.push(linha);
-    }
-
-    flush();
-    return blocos;
-  }
-
-  private formatInline(s: string): string {
-    return s
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-      .replace(/`([^`]+)`/g, '<code>$1</code>');
+  iconeImpacto(nivel: string): string {
+    return nivel === 'alto' ? '🔴' : nivel === 'medio' ? '🟡' : '🟢';
   }
 }
