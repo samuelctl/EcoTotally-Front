@@ -91,13 +91,9 @@
       <button class="eco-btn" type="button" (click)="pedirIa()" [disabled]="carregandoIa()">
         @if (carregandoIa()) { <span class="eco-spinner"></span> Analisando… } @else { 🤖 Pedir análise IA }
       </button>
-<<<<<<< HEAD
       <button class="eco-btn eco-btn-ghost" type="button" (click)="baixarRelatorio()" [disabled]="baixandoPdf()">
         @if (baixandoPdf()) { <span class="eco-spinner"></span> Gerando PDF… } @else { 📄 Baixar PDF }
       </button>
-=======
-      <button class="eco-btn eco-btn-ghost" type="button" (click)="baixarRelatorio()">📄 Baixar PDF</button>
->>>>>>> f356d40218fb94d18b0890e5312a4af7e72a3b60
     </div>
 
     @if (iaBlocos().length > 0) {
