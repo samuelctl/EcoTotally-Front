@@ -1,0 +1,49 @@
+.mapa__lista { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+
+.mapa__item {
+  display: grid;
+  grid-template-columns: 48px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+}
+
+.mapa__icone {
+  width: 48px; height: 48px;
+  border-radius: 14px;
+  background: rgba(46,248,160,0.14);
+  display: grid; place-items: center;
+  font-size: 24px;
+}
+
+.mapa__info { min-width: 0; }
+.mapa__info strong { display: block; font-size: 14px; }
+.mapa__info small { display: block; color: var(--clr-text-muted); font-size: 12px; margin-top: 2px; }
+
+.mapa__tags {
+  margin-top: 6px;
+  display: flex; gap: 4px; flex-wrap: wrap;
+}
+.mapa__tag {
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(46,248,160,0.1);
+  color: var(--clr-accent);
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.mapa__btn {
+  padding: 10px 14px !important;
+  font-size: 12px !important;
+  width: auto !important;
+  border-radius: 12px !important;
+  border: 1px solid var(--clr-border) !important;
+  background: transparent !important;
+  color: var(--clr-accent) !important;
+  cursor: pointer;
+  font-family: var(--ff-mono);
+  font-weight: 700;
+}

@@ -1,0 +1,36 @@
+<main class="eco-page eco-fade-in">
+  <h1 class="eco-h1">Perfil</h1>
+  <p class="eco-subtitle">Gerencie seus dados de conta.</p>
+
+  @if (carregando()) {
+    <div class="eco-card" style="text-align:center;padding:30px;"><span class="eco-spinner lg"></span></div>
+  } @else {
+    <form class="eco-card" (ngSubmit)="salvar()">
+      <label class="eco-label" for="nome">Nome</label>
+      <input id="nome" name="nome" class="eco-input" [(ngModel)]="nome" />
+
+      <label class="eco-label" for="email" style="margin-top:14px;">Email</label>
+      <input id="email" name="email" class="eco-input" type="email" [(ngModel)]="email" />
+
+      <label class="eco-label" for="cidade" style="margin-top:14px;">Cidade</label>
+      <input id="cidade" name="cidade" class="eco-input" [(ngModel)]="cidade" />
+
+      <label class="eco-label" for="senha" style="margin-top:14px;">Nova senha (opcional)</label>
+      <input id="senha" name="senha" class="eco-input" type="password" [(ngModel)]="senha" placeholder="••••••••" />
+
+      @if (erro()) { <div class="eco-error">{{ erro() }}</div> }
+      @if (ok())   { <div class="eco-success">{{ ok() }}</div> }
+
+      <button type="submit" class="eco-btn" style="margin-top:18px;" [disabled]="salvando()">
+        @if (salvando()) { <span class="eco-spinner"></span> } @else { Salvar alterações }
+      </button>
+    </form>
+
+    <div class="perfil__acoes">
+      <button type="button" class="eco-btn eco-btn-ghost" (click)="sair()">Sair</button>
+      <button type="button" class="eco-btn eco-btn-danger" (click)="excluir()" [disabled]="apagando()">
+        @if (apagando()) { <span class="eco-spinner"></span> } @else { Excluir conta }
+      </button>
+    </div>
+  }
+</main>

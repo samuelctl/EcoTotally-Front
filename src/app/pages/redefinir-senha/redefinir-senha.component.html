@@ -1,0 +1,152 @@
+<main class="rs eco-fade-in">
+
+  <!-- ── Brand ──────────────────────────────────────────────────── -->
+  <div class="rs__brand">
+    <img src="logo-ecototally.png" alt="EcoTotally" />
+    <h1>EcoTotally</h1>
+    <p>Redefinição de senha</p>
+  </div>
+
+  <!-- ── Token ausente ──────────────────────────────────────────── -->
+  @if (tokenAusente) {
+    <div class="eco-card rs__aviso">
+      <span class="rs__aviso-icon">⚠️</span>
+      <strong>Link inválido ou expirado</strong>
+      <p>
+        Este link não contém um token válido.<br>
+        Solicite um novo link de recuperação.
+      </p>
+      <a routerLink="/esqueci-senha" class="eco-btn">
+        Solicitar novo link
+      </a>
+    </div>
+  }
+
+  <!-- ── Sucesso ─────────────────────────────────────────────────── -->
+  @else if (sucesso()) {
+    <div class="eco-card rs__sucesso eco-fade-in">
+      <div class="rs__sucesso-icon">✅</div>
+      <strong>Senha redefinida!</strong>
+      <p>Sua senha foi atualizada com sucesso.<br>Redirecionando para o login…</p>
+      <div class="rs__sucesso-bar">
+        <div class="rs__sucesso-barra-fill"></div>
+      </div>
+    </div>
+  }
+
+  <!-- ── Formulário ─────────────────────────────────────────────── -->
+  @else {
+    <form class="eco-card rs__form" (ngSubmit)="enviar()" autocomplete="off">
+
+      <p class="rs__info">
+        🔒 Crie uma nova senha segura para sua conta.<br>
+        <small>Mínimo 6 caracteres.</small>
+      </p>
+
+      <!-- Nova senha -->
+      <label class="eco-label" for="nova">Nova senha</label>
+      <div class="rs__campo-senha">
+        <input
+          id="nova"
+          name="nova"
+          class="eco-input"
+          [type]="mostrarNova() ? 'text' : 'password'"
+          [(ngModel)]="novaSenha"
+          autocomplete="new-password"
+          placeholder="••••••••"
+          required
+        />
+        <button
+          type="button"
+          class="rs__olho"
+          (click)="mostrarNova.set(!mostrarNova())"
+          [attr.aria-label]="mostrarNova() ? 'Ocultar senha' : 'Mostrar senha'"
+        >
+          {{ mostrarNova() ? '🙈' : '👁️' }}
+        </button>
+      </div>
+
+      <!-- Barra de força -->
+      @if (novaSenha.length > 0) {
+        <div class="rs__forca" [attr.data-nivel]="forca()">
+          <div class="rs__forca-track">
+            <div class="rs__forca-fill" [style.width.%]="forca() * 33.33"></div>
+          </div>
+          <span class="rs__forca-label">{{ forcaLabel() }}</span>
+        </div>
+      }
+
+      @if (senhasCurtas) {
+        <small class="rs__hint-erro">Mínimo 6 caracteres</small>
+      }
+
+      <!-- Confirmar senha -->
+      <label class="eco-label" for="confirmar" style="margin-top:16px;">Confirmar senha</label>
+      <div class="rs__campo-senha">
+        <input
+          id="confirmar"
+          name="confirmar"
+          class="eco-input"
+          [class.rs__input-erro]="senhasNaoBatem"
+          [type]="mostrarConfirmar() ? 'text' : 'password'"
+          [(ngModel)]="confirmar"
+          autocomplete="new-password"
+          placeholder="••••••••"
+          required
+        />
+        <button
+          type="button"
+          class="rs__olho"
+          (click)="mostrarConfirmar.set(!mostrarConfirmar())"
+          [attr.aria-label]="mostrarConfirmar() ? 'Ocultar confirmação' : 'Mostrar confirmação'"
+        >
+          {{ mostrarConfirmar() ? '🙈' : '👁️' }}
+        </button>
+      </div>
+
+      @if (senhasNaoBatem) {
+        <small class="rs__hint-erro">As senhas não coincidem</small>
+      }
+
+      <!-- Checklist visual -->
+      @if (novaSenha.length > 0 || confirmar.length > 0) {
+        <ul class="rs__checks">
+          <li [class.rs__check--ok]="novaSenha.length >= 6">
+            <span class="rs__check-icon">{{ novaSenha.length >= 6 ? '✓' : '○' }}</span>
+            Pelo menos 6 caracteres
+          </li>
+          <li [class.rs__check--ok]="novaSenha === confirmar && confirmar.length > 0">
+            <span class="rs__check-icon">{{ novaSenha === confirmar && confirmar.length > 0 ? '✓' : '○' }}</span>
+            Senhas coincidem
+          </li>
+        </ul>
+      }
+
+      <!-- Erro da API -->
+      @if (erro()) {
+        <div class="eco-error">{{ erro() }}</div>
+      }
+
+      <button
+        type="submit"
+        class="eco-btn"
+        style="margin-top:20px;"
+        [disabled]="!podeSalvar"
+      >
+        @if (loading()) {
+          <span class="eco-spinner" style="vertical-align:middle;"></span>
+        } @else {
+          🔑 Redefinir senha
+        }
+      </button>
+
+      <div class="rs__links">
+        <a routerLink="/login">Voltar para login</a>
+        <span>•</span>
+        <a routerLink="/esqueci-senha">Pedir novo link</a>
+      </div>
+
+    </form>
+  }
+
+</main>

@@ -1,0 +1,131 @@
+<main class="eco-page eco-fade-in">
+  <h1 class="eco-h1">Insights</h1>
+  <p class="eco-subtitle">Projeção, comparativos e análise por IA — totalmente configurável.</p>
+
+  <!-- Painel de configuração -->
+  <section class="eco-card cfg">
+    <div class="cfg__row">
+      <div class="cfg__campo">
+        <label class="eco-label" for="janela">
+          Janela de análise
+          <span class="cfg__valor">{{ janelaMeses() }} {{ janelaMeses() === 1 ? 'mês' : 'meses' }}</span>
+        </label>
+        <input id="janela" type="range" min="1" max="24" step="1"
+               [ngModel]="janelaMeses()" (ngModelChange)="janelaMeses.set($event)" class="cfg__slider" />
+        <small class="cfg__hint">Quantos meses passados a IA usa de base</small>
+      </div>
+
+      <div class="cfg__campo">
+        <label class="eco-label" for="proj">
+          Projetar para
+          <span class="cfg__valor">{{ mesesProjetados() }} {{ mesesProjetados() === 1 ? 'mês' : 'meses' }}</span>
+        </label>
+        <input id="proj" type="range" min="1" max="24" step="1"
+               [ngModel]="mesesProjetados()" (ngModelChange)="mesesProjetados.set($event)" class="cfg__slider" />
+        <small class="cfg__hint">Horizonte da previsão</small>
+      </div>
+    </div>
+
+    <button type="button" class="eco-btn eco-btn-ghost cfg__aplicar" (click)="carregar()" [disabled]="carregando()">
+      🔄 Aplicar e recarregar
+    </button>
+  </section>
+
+  @if (carregando()) {
+    <div class="eco-card" style="text-align:center;padding:30px;margin-top:14px;"><span class="eco-spinner lg"></span></div>
+  } @else if (erro() && !dados()) {
+    <div class="eco-error">{{ erro() }}</div>
+    <button class="eco-btn eco-btn-ghost" type="button" (click)="carregar()" style="margin-top:14px;">Tentar de novo</button>
+  } @else if (dados()) {
+    @let d = dados()!;
+
+    <section class="eco-card score eco-fade-in">
+      <div class="score__head">
+        <span class="eco-label">Seu Score</span>
+        <strong class="score__valor">{{ d.score.valor }}</strong>
+        <small class="score__nivel">{{ d.score.nivel }}</small>
+      </div>
+      @if (d.score.motivos.length > 0) {
+        <div class="score__motivos">
+          @for (m of d.score.motivos; track m) { <span class="score__motivo">{{ m }}</span> }
+        </div>
+      }
+    </section>
+
+    <section class="eco-card hero-prev eco-fade-in">
+      <span class="eco-label">Previsão Total ({{ d.meses_projetados }} meses)</span>
+      <strong class="hero-prev__num">R$ {{ d.previsao_total | number:'1.2-2' }}</strong>
+      <div class="hero-prev__chips">
+        <span>📍 {{ d.regiao }}</span>
+        <span>🪟 {{ d.janela_meses_analisada }} meses analisados</span>
+        <span>🔭 {{ d.meses_projetados }} meses projetados</span>
+      </div>
+    </section>
+
+    @if (categorias().length > 0) {
+      <h2 class="lista__titulo">Por categoria</h2>
+      <ul class="cat-lista">
+        @for (c of categorias(); track c.nome) {
+          <li class="eco-card cat-item eco-fade-in">
+            <div class="cat-item__icone">{{ iconeTipo(c.nome) }}</div>
+            <div class="cat-item__info">
+              <strong>{{ c.nome }}</strong>
+              <small>
+                {{ iconeTendencia(c.info.tendencia) }} {{ c.info.tendencia }}
+                · último mês: {{ c.info.ultimo_mes | number:'1.0-2' }}
+                @if (c.info.crescimento_percentual !== undefined) {
+                  · {{ c.info.crescimento_percentual >= 0 ? '+' : '' }}{{ c.info.crescimento_percentual | number:'1.0-1' }}%
+                }
+              </small>
+            </div>
+            <div class="cat-item__valor">
+              <strong>{{ c.info.total_projetado | number:'1.0-2' }}</strong>
+              <small>projetado</small>
+            </div>
+          </li>
+        }
+      </ul>
+    }
+
+    <div class="acoes">
+      <button class="eco-btn" type="button" (click)="pedirIa()" [disabled]="carregandoIa()">
+        @if (carregandoIa()) { <span class="eco-spinner"></span> Analisando… } @else { 🤖 Pedir análise IA }
+      </button>
+<<<<<<< HEAD
+      <button class="eco-btn eco-btn-ghost" type="button" (click)="baixarRelatorio()" [disabled]="baixandoPdf()">
+        @if (baixandoPdf()) { <span class="eco-spinner"></span> Gerando PDF… } @else { 📄 Baixar PDF }
+      </button>
+=======
+      <button class="eco-btn eco-btn-ghost" type="button" (click)="baixarRelatorio()">📄 Baixar PDF</button>
+>>>>>>> f356d40218fb94d18b0890e5312a4af7e72a3b60
+    </div>
+
+    @if (iaBlocos().length > 0) {
+      <section class="eco-card ia-card eco-fade-in">
+        <header class="ia-card__head">
+          <div class="ia-card__avatar">🤖</div>
+          <div>
+            <strong>Análise da IA</strong>
+            <small>Baseada em {{ janelaMeses() }} {{ janelaMeses() === 1 ? 'mês' : 'meses' }} · projeção de {{ mesesProjetados() }}</small>
+          </div>
+        </header>
+        <div class="ia-card__body">
+          @for (b of iaBlocos(); track $index) {
+            @switch (b.tipo) {
+              @case ('titulo') { <h3 class="ia__titulo" [innerHTML]="b.texto"></h3> }
+              @case ('sub') { <h4 class="ia__sub" [innerHTML]="b.texto"></h4> }
+              @case ('item') {
+                <div class="ia__item">
+                  <span class="ia__bullet">›</span>
+                  <span [innerHTML]="b.texto"></span>
+                </div>
+              }
+              @case ('destaque') { <div class="ia__destaque" [innerHTML]="b.texto"></div> }
+              @default { <p class="ia__paragrafo" [innerHTML]="b.texto"></p> }
+            }
+          }
+        </div>
+      </section>
+    }
+  }
+</main>
