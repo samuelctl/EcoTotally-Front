@@ -1,3 +1,4 @@
+
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, signal, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -6,6 +7,7 @@ import { AuthService } from '../../core/auth.service';
 import { ThemeService, ThemeMode } from '../../core/theme.service';
 import { InsightsService } from '../../services/insights.service';
 import { describeError } from '../../core/http-helpers';
+import { RouterModule } from '@angular/router';
 
 interface Prefs {
   notificacoes: boolean;
