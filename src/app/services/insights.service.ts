@@ -1,8 +1,11 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpContext, HttpContextToken } from '@angular/common/http';
 import { Observable, firstValueFrom } from 'rxjs';
 import { API_BASE_URL } from '../core/api.config';
 import { AuthService } from '../core/auth.service';
+
+/** Timeout customizado por requisição (ms). Usado pelo timeoutErrorInterceptor. */
+export const CUSTOM_TIMEOUT_MS = new HttpContextToken<number | null>(() => null);
 
 export interface CategoriaInsight {
   ultimo_mes: number;
@@ -67,7 +70,8 @@ export class InsightsService {
   getRecomendacaoIA(mesesProjetados = 3, janelaMeses = 3): Observable<RecomendacaoResponse> {
     return this.http.post<RecomendacaoResponse>(
       `${API_BASE_URL}/ia/recomendacoes?meses_projetados=${mesesProjetados}&janela_meses=${janelaMeses}`,
-      {}
+      {},
+      { context: new HttpContext().set(CUSTOM_TIMEOUT_MS, 60_000) } // 60s para a IA ter tempo de responder
     );
   }
 
