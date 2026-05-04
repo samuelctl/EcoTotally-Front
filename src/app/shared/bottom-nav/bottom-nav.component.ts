@@ -21,7 +21,6 @@ export class BottomNavComponent {
   readonly itens: NavItem[] = [
   { key: 'menu', label: 'Início', route: '/menu', icon: 'home' },
   { key: 'consumo', label: 'Consumo', route: '/consumo', icon: 'file' },
-  { key: 'metas', label: 'Metas', route: '/metas', icon: 'target' },
   { key: 'simulacao', label: 'Simular', route: '/simulacao', icon: 'zap' },
   { key: 'graficos', label: 'Gráficos', route: '/graficos', icon: 'chart' },
   { key: 'insights', label: 'Insights', route: '/insights', icon: 'bulb' },

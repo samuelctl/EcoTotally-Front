@@ -27,10 +27,16 @@ export const routes: Routes = [
   { path: 'metas', canActivate: [authGuard], loadComponent: () => import('./pages/metas/metas.component').then(m => m.MetasComponent) },
   { path: 'configuracoes', canActivate: [authGuard], loadComponent: () => import('./pages/configuracoes/configuracoes.component').then(m => m.ConfiguracoesComponent) },
   {
+  path: 'privacidade',
+  loadComponent: () => import('./pages/privacidade/privacidade.component')
+    .then(m => m.PrivacidadeComponent)
+  },
+  {
   path: 'termos',
   loadComponent: () => import('./pages/termos/termos.component')
     .then(m => m.TermosComponent)
   },
+
 
   { path: '**', redirectTo: 'menu' }
 ];

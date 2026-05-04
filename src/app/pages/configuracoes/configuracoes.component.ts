@@ -1,13 +1,12 @@
-
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, signal, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+
 import { AuthService } from '../../core/auth.service';
 import { ThemeService, ThemeMode } from '../../core/theme.service';
 import { InsightsService } from '../../services/insights.service';
 import { describeError } from '../../core/http-helpers';
-import { RouterModule } from '@angular/router';
 
 interface Prefs {
   notificacoes: boolean;
@@ -118,7 +117,7 @@ const LANG_LABELS: Record<string, Record<string, string>> = {
 @Component({
   selector: 'app-configuracoes',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './configuracoes.component.html',
   styleUrls: ['./configuracoes.component.scss']
 })
@@ -138,7 +137,6 @@ export class ConfiguracoesComponent implements OnInit {
   msgOk = signal<string | null>(null);
   msgErro = signal<string | null>(null);
 
-  /** Translations computed from current prefs idioma */
   t = computed(() => LANG_LABELS[this.prefs().idioma] ?? LANG_LABELS['pt-BR']);
 
   ngOnInit(): void {
@@ -154,14 +152,19 @@ export class ConfiguracoesComponent implements OnInit {
   togglePref<K extends keyof Prefs>(key: K, value: Prefs[K]): void {
     const next = { ...this.prefs(), [key]: value };
     this.prefs.set(next);
-    try { localStorage.setItem(PREFS_KEY, JSON.stringify(next)); } catch { /* ignore */ }
+
+    try {
+      localStorage.setItem(PREFS_KEY, JSON.stringify(next));
+    } catch {}
 
     if (key === 'idioma') {
       this.applyLanguage(value as string);
     }
+
     if (key === 'reduzirAnimacoes') {
       this.applyAnimations(value as boolean);
     }
+
     if (key === 'notificacoes') {
       this.handleNotificationPref(value as boolean);
     }
@@ -169,8 +172,10 @@ export class ConfiguracoesComponent implements OnInit {
 
   async baixarRelatorio(): Promise<void> {
     if (this.baixandoPdf()) return;
+
     this.baixandoPdf.set(true);
     this.msgErro.set(null);
+
     try {
       await this.insights.baixarRelatorioPdf();
       this.flash(this.t()['reportDownloaded'] ?? 'Relatório baixado com sucesso.');
@@ -183,14 +188,24 @@ export class ConfiguracoesComponent implements OnInit {
 
   limparCache(): void {
     const msg = this.t()['confirmCache'] ?? 'Limpar dados em cache do app?';
+
     if (!confirm(msg)) return;
+
     const prefs = localStorage.getItem(PREFS_KEY);
     const theme = localStorage.getItem('eco_theme_mode');
+
     try {
       localStorage.clear();
-      if (prefs) localStorage.setItem(PREFS_KEY, prefs);
-      if (theme) localStorage.setItem('eco_theme_mode', theme);
-    } catch { /* ignore */ }
+
+      if (prefs) {
+        localStorage.setItem(PREFS_KEY, prefs);
+      }
+
+      if (theme) {
+        localStorage.setItem('eco_theme_mode', theme);
+      }
+    } catch {}
+
     this.flash(this.t()['cacheCleared'] ?? 'Cache limpo.');
     this.router.navigate(['/login']);
   }
@@ -202,7 +217,10 @@ export class ConfiguracoesComponent implements OnInit {
 
   private applyLanguage(lang: string): void {
     document.documentElement.setAttribute('lang', lang);
-    try { localStorage.setItem('eco_lang', lang); } catch { /* ignore */ }
+
+    try {
+      localStorage.setItem('eco_lang', lang);
+    } catch {}
   }
 
   private applyAnimations(reduce: boolean): void {
@@ -225,10 +243,12 @@ export class ConfiguracoesComponent implements OnInit {
             icon: 'logo-ecototally.png',
           });
         } else {
-          // User denied — revert pref silently
           const next = { ...this.prefs(), notificacoes: false };
           this.prefs.set(next);
-          try { localStorage.setItem(PREFS_KEY, JSON.stringify(next)); } catch { /* ignore */ }
+
+          try {
+            localStorage.setItem(PREFS_KEY, JSON.stringify(next));
+          } catch {}
         }
       });
     } else if (Notification.permission === 'granted') {
@@ -251,12 +271,15 @@ export class ConfiguracoesComponent implements OnInit {
       idioma: 'pt-BR',
       reduzirAnimacoes: false,
     };
+
     try {
       const raw = localStorage.getItem(PREFS_KEY);
+
       if (!raw) return def;
+
       const parsed = JSON.parse(raw);
-      // Remove legacy emailMarketing key if present
       delete parsed['emailMarketing'];
+
       return { ...def, ...parsed };
     } catch {
       return def;
