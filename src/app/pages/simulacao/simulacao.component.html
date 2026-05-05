@@ -1,0 +1,83 @@
+<main class="eco-page eco-fade-in">
+  <h1 class="eco-h1">Simulação</h1>
+  <p class="eco-subtitle">Calcule o impacto e o custo de uma atividade. Atualiza sozinho.</p>
+
+  <form class="eco-card" (ngSubmit)="criar()">
+    <label class="eco-label" for="atividade">Atividade</label>
+    <input id="atividade" name="atividade" class="eco-input"
+           [(ngModel)]="atividade" placeholder="Ex.: Banho de 15min" />
+
+    <div class="eco-row" style="margin-top:14px;">
+      <div>
+        <label class="eco-label" for="tipo">Tipo</label>
+        <select id="tipo" name="tipo" class="eco-select" [(ngModel)]="tipo">
+          @for (t of tipos; track t) { <option [value]="t">{{ t }}</option> }
+        </select>
+      </div>
+      <div>
+        <label class="eco-label" for="valor">
+          Valor de consumo
+          <span class="eco-muted" style="text-transform:none;letter-spacing:0;font-weight:400;font-size:11px;">
+            ({{ tipo === 'Agua' ? 'm³' : 'kWh' }})
+          </span>
+        </label>
+        <input id="valor" name="valor" class="eco-input" type="number" inputmode="decimal" step="0.01" min="0"
+               [(ngModel)]="consumoValor" placeholder="0" />
+      </div>
+    </div>
+
+    @if (erro()) { <div class="eco-error">{{ erro() }}</div> }
+
+    <button type="submit" class="eco-btn" style="margin-top:14px;" [disabled]="salvando()">
+      @if (salvando()) { <span class="eco-spinner"></span> } @else { ⚡ Simular }
+    </button>
+  </form>
+
+  @if (itens().length > 0) {
+    <section class="eco-card sim__resumo">
+      <div>
+        <span class="eco-label">Total simulado</span>
+        <strong>R$ {{ resumo().totalCusto | number:'1.2-2' }}</strong>
+      </div>
+      <div class="sim__resumo-sep"></div>
+      <div>
+        <span class="eco-label">Simulações</span>
+        <strong>{{ resumo().qtd }}</strong>
+      </div>
+    </section>
+  }
+
+  <h2 class="lista__titulo">Histórico</h2>
+
+  @if (carregando() && itens().length === 0) {
+    <div class="eco-card" style="text-align:center;padding:30px;">
+      <span class="eco-spinner lg"></span>
+    </div>
+  } @else if (itens().length === 0) {
+    <div class="eco-card eco-empty">
+      Nenhuma simulação ainda. Faça a primeira ☝️
+    </div>
+  } @else {
+    <ul class="lista">
+      @for (item of itens(); track trackId($index, item)) {
+        <li class="eco-card sim__item eco-fade-in">
+          <div class="lista__icone">
+            @if (item.tipo === 'Agua') { 💧 } @else { ⚡ }
+          </div>
+          <div class="sim__info">
+            <strong>{{ item.atividade || item.nome_atividade || '—' }}</strong>
+            <div class="sim__meta">
+              <span class="sim__tag">{{ item.tipo }}</span>
+              <span class="sim__consumo">{{ consumo(item) | number:'1.0-2' }} {{ unidade(item) }}</span>
+            </div>
+          </div>
+          <div class="sim__valores">
+            <strong class="sim__custo">R$ {{ custoEstimado(item) | number:'1.2-2' }}</strong>
+            <small class="sim__legenda">custo estimado</small>
+          </div>
+          <button type="button" class="lista__del" (click)="deletar(item)" aria-label="Deletar">×</button>
+        </li>
+      }
+    </ul>
+  }
+</main>

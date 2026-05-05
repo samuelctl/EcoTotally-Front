@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">EcoTotally</string>
+    <string name="title_activity_main">EcoTotally</string>
+    <string name="package_name">com.ecototally.app</string>
+    <string name="custom_url_scheme">com.ecototally.app</string>
+</resources>

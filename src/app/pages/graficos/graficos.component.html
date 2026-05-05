@@ -1,0 +1,92 @@
+<main class="eco-page eco-fade-in">
+  <h1 class="eco-h1">Gráficos</h1>
+  <p class="eco-subtitle">Visualize consumos e simulações por categoria.</p>
+
+  <!-- Tabs -->
+  <div class="gtabs" role="tablist">
+    <button type="button" class="gtabs__btn" [class.gtabs__btn--ativo]="aba() === 'consumos'"
+            (click)="setAba('consumos')" role="tab">
+      📊 Consumos
+    </button>
+    <button type="button" class="gtabs__btn" [class.gtabs__btn--ativo]="aba() === 'simulacoes'"
+            (click)="setAba('simulacoes')" role="tab">
+      ⚡ Simulações
+    </button>
+  </div>
+
+  @if (carregando() && consumos().length === 0 && simulacoes().length === 0) {
+    <div class="eco-card" style="text-align:center;padding:30px;"><span class="eco-spinner lg"></span></div>
+  } @else if (aba() === 'consumos') {
+    @if (porTipoConsumo().length === 0) {
+      <div class="eco-card eco-empty">Sem consumos ainda. Cadastre alguns para ver os gráficos.</div>
+    } @else {
+      <section class="eco-card g-hero">
+        <span class="eco-label">Total geral</span>
+        <strong class="g-hero__num">R$ {{ totalConsumos() | number:'1.2-2' }}</strong>
+        <small class="eco-muted">{{ consumos().length }} registros</small>
+      </section>
+
+      <section class="eco-card" style="margin-top:14px;">
+        <span class="eco-label">Por categoria</span>
+        <div class="bars">
+          @for (b of porTipoConsumo(); track b.label) {
+            <div class="bar">
+              <div class="bar__head">
+                <strong>{{ b.label }}</strong>
+                <span>R$ {{ b.valor | number:'1.2-2' }}</span>
+              </div>
+              <div class="bar__track">
+                <div class="bar__fill" [style.width.%]="pct(b, maxConsumo())" [style.background]="b.cor"></div>
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+
+      @if (tendenciaMensal().length > 0) {
+        <section class="eco-card" style="margin-top:14px;">
+          <span class="eco-label">Tendência mensal</span>
+          <div class="trend">
+            @for (m of tendenciaMensal(); track m.label) {
+              <div class="trend__col">
+                <div class="trend__bar-wrap">
+                  <div class="trend__bar" [style.height.%]="m.pct"></div>
+                </div>
+                <small class="trend__label">{{ m.label }}</small>
+                <small class="trend__valor">{{ m.valor | number:'1.0-0' }}</small>
+              </div>
+            }
+          </div>
+        </section>
+      }
+    }
+  } @else {
+    @if (porTipoSimulacao().length === 0) {
+      <div class="eco-card eco-empty">Sem simulações ainda. Crie em <strong>Simulação</strong> ⚡</div>
+    } @else {
+      <section class="eco-card g-hero g-hero--sim">
+        <span class="eco-label">Custo total simulado</span>
+        <strong class="g-hero__num">R$ {{ totalSimulacoes() | number:'1.2-2' }}</strong>
+        <small class="eco-muted">{{ simulacoes().length }} simulações</small>
+      </section>
+
+      <section class="eco-card" style="margin-top:14px;">
+        <span class="eco-label">Por tipo</span>
+        <div class="bars">
+          @for (b of porTipoSimulacao(); track b.label) {
+            <div class="bar">
+              <div class="bar__head">
+                <strong>{{ b.label }}</strong>
+                <span>R$ {{ b.valor | number:'1.2-2' }}</span>
+              </div>
+              <div class="bar__track">
+                <div class="bar__fill" [style.width.%]="pct(b, maxSimulacao())" [style.background]="b.cor"></div>
+              </div>
+              @if (b.sub) { <small class="bar__sub">{{ b.sub }}</small> }
+            </div>
+          }
+        </div>
+      </section>
+    }
+  }
+</main>

@@ -1,0 +1,103 @@
+<main class="eco-page eco-fade-in">
+  <header class="menu__top">
+    <div>
+      <p class="menu__hi">Olá,</p>
+      <h1 class="menu__nome">{{ nome() }}</h1>
+    </div>
+    <img src="logo-ecototally.png" alt="" class="menu__logo" />
+  </header>
+
+  <section class="menu__hero eco-card">
+    <div class="menu__hero-icon">🌱</div>
+    <div>
+      <h2>Seu impacto, em tempo real</h2>
+      <p>Atualizado automaticamente a cada 10s.</p>
+    </div>
+  </section>
+
+  <section class="menu__stats">
+    <div class="eco-card menu__stat">
+      <span class="menu__stat-label">Consumos</span>
+      <strong class="menu__stat-value">{{ totalConsumos() }}</strong>
+    </div>
+    <div class="eco-card menu__stat">
+      <span class="menu__stat-label">Simulações</span>
+      <strong class="menu__stat-value">{{ totalSimulacoes() }}</strong>
+    </div>
+    <div class="eco-card menu__stat menu__stat--wide">
+      <span class="menu__stat-label">Gasto total acumulado</span>
+      <strong class="menu__stat-value">R$ {{ somaGasto() | number:'1.2-2' }}</strong>
+    </div>
+  </section>
+
+  <!-- ===== Metas ===== -->
+  <div class="menu__sec-head">
+    <h3 class="menu__section">Metas</h3>
+    <a routerLink="/metas" class="menu__sec-link">Ver todas →</a>
+  </div>
+
+  @if (metas().length === 0) {
+    <a routerLink="/metas" class="eco-card menu__metas-empty">
+      <span style="font-size:24px;">🎯</span>
+      <div>
+        <strong>Nenhuma meta criada</strong>
+        <small>Defina limites de gastos e acompanhe seu progresso</small>
+      </div>
+    </a>
+  } @else {
+    <div class="menu__metas">
+      @for (mr of metasResumo(); track mr.meta.id_meta) {
+        <a routerLink="/metas" class="eco-card menu__meta" [attr.data-status]="mr.status">
+          <div class="menu__meta-head">
+            <strong>{{ mr.meta.tipo_meta }}</strong>
+            <span class="menu__meta-pct">{{ mr.pct | number:'1.0-0' }}%</span>
+          </div>
+          <div class="menu__meta-bar">
+            <div class="menu__meta-bar-fill" [style.width.%]="mr.pct > 100 ? 100 : mr.pct"></div>
+          </div>
+          <small>R$ {{ mr.acumulado | number:'1.2-2' }} / R$ {{ mr.meta.valor_objetivo | number:'1.2-2' }}</small>
+        </a>
+      }
+    </div>
+  }
+
+  <!-- ===== Atalhos ===== -->
+  <h3 class="menu__section">Atalhos</h3>
+  <nav class="menu__grid">
+    <a routerLink="/consumo" class="eco-card menu__tile">
+      <span class="menu__tile-icon">📊</span>
+      <strong>Consumo</strong>
+      <small>Registre seus gastos</small>
+    </a>
+    <a routerLink="/metas" class="eco-card menu__tile">
+      <span class="menu__tile-icon">🎯</span>
+      <strong>Metas</strong>
+      <small>Defina limites</small>
+    </a>
+    <a routerLink="/simulacao" class="eco-card menu__tile">
+      <span class="menu__tile-icon">⚡</span>
+      <strong>Simular</strong>
+      <small>Calcule impactos</small>
+    </a>
+    <a routerLink="/graficos" class="eco-card menu__tile">
+      <span class="menu__tile-icon">📈</span>
+      <strong>Gráficos</strong>
+      <small>Visualize tendências</small>
+    </a>
+    <a routerLink="/insights" class="eco-card menu__tile">
+      <span class="menu__tile-icon">💡</span>
+      <strong>Insights</strong>
+      <small>Recomendações IA</small>
+    </a>
+    <a routerLink="/mapa" class="eco-card menu__tile">
+      <span class="menu__tile-icon">🗺️</span>
+      <strong>Mapa</strong>
+      <small>Pontos de reciclagem</small>
+    </a>
+    <a routerLink="/perfil" class="eco-card menu__tile">
+      <span class="menu__tile-icon">👤</span>
+      <strong>Perfil</strong>
+      <small>Editar dados</small>
+    </a>
+  </nav>
+</main>

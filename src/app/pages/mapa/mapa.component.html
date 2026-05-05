@@ -1,0 +1,31 @@
+<main class="eco-page eco-fade-in">
+  <h1 class="eco-h1">Pontos de reciclagem</h1>
+  <p class="eco-subtitle">
+    @if (coordsUser(); as c) { Próximos a você ({{ c.lat | number:'1.4-4' }}, {{ c.lon | number:'1.4-4' }}) }
+    @else { Mostrando pontos da região central. }
+  </p>
+
+  @if (carregando()) {
+    <div class="eco-card" style="text-align:center;padding:30px;"><span class="eco-spinner lg"></span></div>
+  } @else if (erro()) {
+    <div class="eco-error">{{ erro() }}</div>
+  } @else if (pontos().length === 0) {
+    <div class="eco-card eco-empty">Nenhum ponto encontrado.</div>
+  } @else {
+    <ul class="mapa__lista">
+      @for (p of pontos(); track $index) {
+        <li class="eco-card mapa__item eco-fade-in">
+          <div class="mapa__icone">♻️</div>
+          <div class="mapa__info">
+            <strong>{{ p.nome || 'Ponto de coleta' }}</strong>
+            @if (p.endereco) { <small>{{ p.endereco }}</small> }
+            <div class="mapa__tags">
+              @for (t of tipos(p); track t) { <span class="mapa__tag">{{ t }}</span> }
+            </div>
+          </div>
+          <button class="eco-btn-ghost mapa__btn" type="button" (click)="abrirNoMaps(p)">Rotas</button>
+        </li>
+      }
+    </ul>
+  }
+</main>

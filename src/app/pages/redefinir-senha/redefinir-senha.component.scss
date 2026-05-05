@@ -1,0 +1,269 @@
+.rs {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: calc(40px + var(--safe-top)) 18px 40px;
+  max-width: 440px;
+  margin: 0 auto;
+}
+
+/* ── Brand ───────────────────────────────────────────────────────── */
+.rs__brand {
+  text-align: center;
+  margin-bottom: 28px;
+
+  img {
+    width: 68px;
+    height: 68px;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 14px rgba(46, 248, 160, 0.3));
+  }
+
+  h1 {
+    font-family: var(--ff-mono);
+    font-size: 24px;
+    margin: 8px 0 4px;
+    letter-spacing: 1px;
+    background: linear-gradient(90deg, var(--clr-accent), #fff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  p {
+    color: var(--clr-text-muted);
+    margin: 0;
+    font-size: 13px;
+  }
+}
+
+/* ── Formulário ──────────────────────────────────────────────────── */
+.rs__form {
+  padding: 24px 20px;
+}
+
+.rs__info {
+  margin: 0 0 20px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--clr-text-muted);
+
+  small {
+    font-size: 12px;
+    color: var(--clr-text-dim);
+  }
+}
+
+/* ── Campo com olho ──────────────────────────────────────────────── */
+.rs__campo-senha {
+  position: relative;
+}
+
+.rs__olho {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 6px 10px;
+  line-height: 1;
+  color: var(--clr-text-muted);
+  transition: color 0.15s;
+
+  &:hover { color: var(--clr-text); }
+}
+
+.rs__input-erro {
+  border-color: rgba(255, 100, 100, 0.5) !important;
+  box-shadow: 0 0 0 3px rgba(255, 100, 100, 0.1) !important;
+}
+
+/* ── Força da senha ──────────────────────────────────────────────── */
+.rs__forca {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.rs__forca-track {
+  flex: 1;
+  height: 5px;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.rs__forca-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.4s ease, background 0.4s ease;
+  background: var(--clr-error); /* padrão fraca */
+}
+
+.rs__forca[data-nivel="1"] .rs__forca-fill { background: var(--clr-error); }
+.rs__forca[data-nivel="2"] .rs__forca-fill { background: var(--clr-warning); }
+.rs__forca[data-nivel="3"] .rs__forca-fill {
+  background: linear-gradient(90deg, var(--clr-accent-2), var(--clr-accent));
+  box-shadow: 0 0 10px rgba(46, 248, 160, 0.4);
+}
+
+.rs__forca-label {
+  font-size: 11px;
+  font-family: var(--ff-mono);
+  font-weight: 700;
+  min-width: 36px;
+  text-align: right;
+  color: var(--clr-text-muted);
+}
+
+.rs__forca[data-nivel="1"] .rs__forca-label { color: var(--clr-error); }
+.rs__forca[data-nivel="2"] .rs__forca-label { color: var(--clr-warning); }
+.rs__forca[data-nivel="3"] .rs__forca-label { color: var(--clr-accent); }
+
+/* ── Hint de erro inline ─────────────────────────────────────────── */
+.rs__hint-erro {
+  display: block;
+  margin-top: 5px;
+  font-size: 12px;
+  color: var(--clr-error);
+}
+
+/* ── Checklist ───────────────────────────────────────────────────── */
+.rs__checks {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--clr-text-dim);
+    transition: color 0.2s;
+  }
+
+  li.rs__check--ok {
+    color: var(--clr-accent);
+  }
+}
+
+.rs__check-icon {
+  font-size: 13px;
+  font-weight: 700;
+  width: 16px;
+  text-align: center;
+  font-family: var(--ff-mono);
+}
+
+/* ── Links rodapé ────────────────────────────────────────────────── */
+.rs__links {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 18px;
+  font-size: 13px;
+
+  a {
+    color: var(--clr-accent);
+    text-decoration: none;
+    font-weight: 600;
+
+    &:hover { text-decoration: underline; }
+  }
+
+  span { color: var(--clr-text-dim); }
+}
+
+/* ── Estado: token ausente ───────────────────────────────────────── */
+.rs__aviso {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 32px 24px;
+  text-align: center;
+
+  .rs__aviso-icon { font-size: 40px; }
+
+  strong {
+    font-size: 16px;
+    color: var(--clr-warning);
+    font-family: var(--ff-mono);
+  }
+
+  p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--clr-text-muted);
+    line-height: 1.6;
+  }
+
+  .eco-btn { margin-top: 8px; }
+}
+
+/* ── Estado: sucesso ─────────────────────────────────────────────── */
+.rs__sucesso {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 36px 24px;
+  text-align: center;
+  background: linear-gradient(160deg, rgba(46, 248, 160, 0.12), rgba(15, 90, 70, 0.55)) !important;
+  border-color: rgba(46, 248, 160, 0.25) !important;
+
+  .rs__sucesso-icon {
+    font-size: 48px;
+    animation: bounce-in 0.5s cubic-bezier(.22,.61,.36,1) both;
+  }
+
+  strong {
+    font-size: 18px;
+    font-family: var(--ff-mono);
+    color: var(--clr-accent);
+  }
+
+  p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--clr-text-muted);
+    line-height: 1.6;
+  }
+}
+
+.rs__sucesso-bar {
+  width: 100%;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.rs__sucesso-barra-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--clr-accent-2), var(--clr-accent));
+  border-radius: 999px;
+  animation: progress-fill 2.5s linear forwards;
+}
+
+@keyframes progress-fill {
+  from { width: 0%; }
+  to   { width: 100%; }
+}
+
+@keyframes bounce-in {
+  0%   { transform: scale(0.3); opacity: 0; }
+  60%  { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); }
+}

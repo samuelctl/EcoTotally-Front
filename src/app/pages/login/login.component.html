@@ -1,0 +1,40 @@
+<main class="login eco-fade-in">
+  <div class="login__brand">
+    <img src="logo-ecototally.png" alt="EcoTotally" />
+    <h1>EcoTotally</h1>
+    <p>Reduza, monitore e impacte.</p>
+  </div>
+
+  <form class="eco-card login__form" (ngSubmit)="entrar()" autocomplete="on">
+    @if (sessaoExpirou()) {
+      <div class="eco-error">Sua sessão expirou. Entre novamente.</div>
+    }
+
+    <label class="eco-label" for="email">Email</label>
+    <input id="email" class="eco-input" type="email" name="email" autocomplete="email"
+           [(ngModel)]="email" placeholder="voce@exemplo.com" required />
+
+    <label class="eco-label" for="senha" style="margin-top: 14px;">Senha</label>
+    <div class="login__senha">
+      <input id="senha" class="eco-input" name="senha" autocomplete="current-password"
+             [type]="mostrarSenha() ? 'text' : 'password'" [(ngModel)]="senha" placeholder="••••••••" required />
+      <button type="button" class="login__olho" (click)="mostrarSenha.set(!mostrarSenha())"
+              [attr.aria-label]="mostrarSenha() ? 'Ocultar senha' : 'Mostrar senha'">
+        {{ mostrarSenha() ? '🙈' : '👁️' }}
+      </button>
+    </div>
+
+    @if (erro()) { <div class="eco-error">{{ erro() }}</div> }
+
+    <button type="submit" class="eco-btn" style="margin-top: 18px;" [disabled]="loading()">
+      @if (loading()) { <span class="eco-spinner" style="vertical-align:middle;"></span> }
+      @else { Entrar }
+    </button>
+
+    <div class="login__links">
+      <a routerLink="/esqueci-senha">Esqueci a senha</a>
+      <span>•</span>
+      <a routerLink="/cadastro">Criar conta</a>
+    </div>
+  </form>
+</main>

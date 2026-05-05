@@ -1,0 +1,184 @@
+<section class="eco-page eco-fade-in">
+  <h1 class="eco-h1">{{ t()["settings"] }}</h1>
+  <p class="eco-subtitle">{{ t()["subtitle"] }}</p>
+
+  <!-- Conta -->
+  <div class="eco-card cfg-card">
+    <header class="cfg-head">
+      <div class="cfg-avatar">
+        {{ (nomeUsuario()[0] || "U").toUpperCase() }}
+      </div>
+
+      <div>
+        <strong>{{ nomeUsuario() }}</strong>
+        <small>{{ emailUsuario() }}</small>
+      </div>
+    </header>
+
+    <button class="eco-btn eco-btn-ghost" type="button" routerLink="/perfil">
+      Ver meu perfil
+    </button>
+  </div>
+
+  <!-- Aparência -->
+  <div class="eco-card cfg-card">
+    <h2 class="cfg-title">{{ t()["appearance"] }}</h2>
+    <p class="cfg-desc">Escolha como o app deve ser exibido.</p>
+
+    <div class="cfg-theme-row">
+      <button
+        type="button"
+        class="cfg-theme-opt"
+        [class.is-active]="theme.mode() === 'light'"
+        (click)="setTheme('light')"
+      >
+        <span class="cfg-theme-swatch cfg-theme-swatch--light"></span>
+        {{ t()["light"] }}
+      </button>
+
+      <button
+        type="button"
+        class="cfg-theme-opt"
+        [class.is-active]="theme.mode() === 'dark'"
+        (click)="setTheme('dark')"
+      >
+        <span class="cfg-theme-swatch cfg-theme-swatch--dark"></span>
+        {{ t()["dark"] }}
+      </button>
+
+      <button
+        type="button"
+        class="cfg-theme-opt"
+        [class.is-active]="theme.mode() === 'system'"
+        (click)="setTheme('system')"
+      >
+        <span class="cfg-theme-swatch cfg-theme-swatch--auto"></span>
+        {{ t()["system"] }}
+      </button>
+    </div>
+
+    <label class="cfg-toggle">
+      <input
+        type="checkbox"
+        [checked]="prefs().reduzirAnimacoes"
+        (change)="togglePref('reduzirAnimacoes', $any($event.target).checked)"
+      />
+      <span>{{ t()["reduceAnim"] }}</span>
+    </label>
+  </div>
+
+  <!-- Notificações -->
+  <div class="eco-card cfg-card">
+    <h2 class="cfg-title">{{ t()["notifications"] }}</h2>
+
+    <label class="cfg-toggle">
+      <input
+        type="checkbox"
+        [checked]="prefs().notificacoes"
+        (change)="togglePref('notificacoes', $any($event.target).checked)"
+      />
+      <span>{{ t()["alertsLabel"] }}</span>
+    </label>
+  </div>
+
+  <!-- Preferências -->
+  <div class="eco-card cfg-card">
+    <h2 class="cfg-title">{{ t()["preferences"] }}</h2>
+
+    <label class="eco-label">{{ t()["language"] }}</label>
+    <select
+      class="eco-select"
+      [value]="prefs().idioma"
+      (change)="togglePref('idioma', $any($event.target).value)"
+    >
+      <option value="pt-BR">Português (Brasil)</option>
+      <option value="en-US">English (US)</option>
+      <option value="es-ES">Español</option>
+    </select>
+
+    <label class="eco-label" style="margin-top: 14px">
+      {{ t()["energyUnit"] }}
+    </label>
+
+    <select
+      class="eco-select"
+      [value]="prefs().unidade"
+      (change)="togglePref('unidade', $any($event.target).value)"
+    >
+      <option value="kWh">kWh</option>
+      <option value="MJ">MJ</option>
+    </select>
+  </div>
+
+  <!-- Dados / Relatórios -->
+  <div class="eco-card cfg-card">
+    <h2 class="cfg-title">{{ t()["dataReports"] }}</h2>
+    <p class="cfg-desc">{{ t()["dataDesc"] }}</p>
+
+    <button
+      class="eco-btn"
+      type="button"
+      (click)="baixarRelatorio()"
+      [disabled]="baixandoPdf()"
+    >
+      @if (baixandoPdf()) {
+        <span class="eco-spinner"></span> {{ t()["generatingPdf"] }}
+      } @else {
+        {{ t()["downloadPdf"] }}
+      }
+    </button>
+
+    <button
+      class="eco-btn eco-btn-ghost"
+      type="button"
+      (click)="limparCache()"
+      style="margin-top: 10px"
+    >
+      {{ t()["clearCache"] }}
+    </button>
+  </div>
+
+  <!-- Sobre -->
+  <div class="eco-card cfg-card">
+    <h2 class="cfg-title">{{ t()["about"] }}</h2>
+
+    <ul class="cfg-list">
+      <li>
+        <span>{{ t()["version"] }}</span>
+        <strong>{{ versao }}</strong>
+      </li>
+
+      <li>
+        <span>{{ t()["support"] }}</span>
+        <a href="mailto:ectotally&#64;gmail.com">ectotally&#64;gmail.com</a>
+      </li>
+
+      <li>
+        <span>{{ t()["privacy"] }}</span>
+        <a routerLink="/privacidade">Ver</a>
+      </li>
+
+      <li>
+        <span>{{ t()["terms"] }}</span>
+        <a routerLink="/termos">Ver</a>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Conta — sair -->
+  <div class="eco-card cfg-card">
+    <h2 class="cfg-title">{{ t()["account"] }}</h2>
+
+    <button class="eco-btn eco-btn-danger" type="button" (click)="sair()">
+      {{ t()["logout"] }}
+    </button>
+  </div>
+
+  @if (msgOk()) {
+    <div class="eco-success">{{ msgOk() }}</div>
+  }
+
+  @if (msgErro()) {
+    <div class="eco-error">{{ msgErro() }}</div>
+  }
+</section>
