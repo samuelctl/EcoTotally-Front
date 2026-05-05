@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { Geolocation } from '@capacitor/geolocation';
 import { MapaService, PontoReciclagem } from '../../services/mapa.service';
 import { describeError } from '../../core/http-helpers';
 
@@ -19,24 +18,16 @@ export class MapaComponent implements OnInit {
   erro = signal<string | null>(null);
   coordsUser = signal<{ lat: number; lon: number } | null>(null);
 
-  async ngOnInit(): Promise<void> {
-    try {
-      // Pede permissão ao usuário — mostra o popup nativo do Android
-      const permissao = await Geolocation.requestPermissions();
-
-      if (permissao.location === 'granted') {
-        const pos = await Geolocation.getCurrentPosition({ timeout: 10000 });
-        const lat = pos.coords.latitude;
-        const lon = pos.coords.longitude;
-        this.coordsUser.set({ lat, lon });
-        this.carregar(lat, lon);
-      } else {
-        // Usuário negou — carrega com localização padrão (Brasília)
-        this.carregar();
-      }
-    } catch {
-      this.carregar();
-    }
+  ngOnInit(): void {
+    if (typeof navigator !== 'undefined' && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (p) => {
+          this.coordsUser.set({ lat: p.coords.latitude, lon: p.coords.longitude });
+          this.carregar(p.coords.latitude, p.coords.longitude);
+        },
+        () => this.carregar()
+      );
+    } else { this.carregar(); }
   }
 
   carregar(lat = -15.8, lon = -47.9): void {

@@ -96,31 +96,44 @@
       </button>
     </div>
 
-    @if (iaBlocos().length > 0) {
+    @if (iaObjeto()) {
+      @let ia = iaObjeto()!;
       <section class="eco-card ia-card eco-fade-in">
+
         <header class="ia-card__head">
           <div class="ia-card__avatar">🤖</div>
           <div>
             <strong>Análise da IA</strong>
-            <small>Baseada em {{ janelaMeses() }} {{ janelaMeses() === 1 ? 'mês' : 'meses' }} · projeção de {{ mesesProjetados() }}</small>
+            <small>Urgência: {{ iconeImpacto(ia.nivel_urgencia) }} {{ ia.nivel_urgencia }}</small>
           </div>
         </header>
-        <div class="ia-card__body">
-          @for (b of iaBlocos(); track $index) {
-            @switch (b.tipo) {
-              @case ('titulo') { <h3 class="ia__titulo" [innerHTML]="b.texto"></h3> }
-              @case ('sub') { <h4 class="ia__sub" [innerHTML]="b.texto"></h4> }
-              @case ('item') {
-                <div class="ia__item">
-                  <span class="ia__bullet">›</span>
-                  <span [innerHTML]="b.texto"></span>
-                </div>
-              }
-              @case ('destaque') { <div class="ia__destaque" [innerHTML]="b.texto"></div> }
-              @default { <p class="ia__paragrafo" [innerHTML]="b.texto"></p> }
-            }
-          }
+
+        <div class="ia__secao">
+          <h3 class="ia__titulo">📋 Diagnóstico Geral</h3>
+          <p class="ia__paragrafo">{{ ia.diagnostico_geral }}</p>
         </div>
+
+        <div class="ia__destaque">
+          💰 Economia estimada: <strong>R$ {{ ia.economia_estimativa_mensal | number:'1.2-2' }}/mês</strong>
+        </div>
+
+        <div class="ia__alerta">
+          📍 {{ ia.alerta_amostra_regional }}
+        </div>
+
+        <h3 class="ia__titulo">💡 Recomendações</h3>
+        @for (rec of ia.recomendacoes; track rec.titulo) {
+          <div class="ia__rec">
+            <div class="ia__rec-head">
+              <strong>{{ rec.titulo }}</strong>
+              <span class="ia__badge" [attr.data-impacto]="rec.impacto">
+                {{ iconeImpacto(rec.impacto) }} {{ rec.impacto }}
+              </span>
+            </div>
+            <p>{{ rec.descricao }}</p>
+          </div>
+        }
+
       </section>
     }
   }
