@@ -1,4 +1,7 @@
 import { HttpInterceptorFn } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { catchError, throwError } from 'rxjs';
 
 function isPublicRoute(url: string, method: string): boolean {
   let path = '';
@@ -11,12 +14,24 @@ function isPublicRoute(url: string, method: string): boolean {
 }
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
+  const router = inject(Router);
+
   if (isPublicRoute(req.url, req.method.toUpperCase())) return next(req);
 
   const token = localStorage.getItem('eco_access_token');
-  if (!token) return next(req);
+  const authReq = token
+    ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
+    : req;
 
-  return next(
-    req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
+  return next(authReq).pipe(
+    catchError((err) => {
+      if (err?.status === 401) {
+        // Limpa token e redireciona para login com aviso de sessão expirada
+        localStorage.removeItem('eco_access_token');
+        localStorage.removeItem('eco_token_type');
+        router.navigate(['/login'], { queryParams: { expirado: '1' } });
+      }
+      return throwError(() => err);
+    })
   );
 };

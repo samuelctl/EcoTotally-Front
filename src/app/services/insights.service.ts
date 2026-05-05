@@ -4,7 +4,6 @@ import { Observable, firstValueFrom } from 'rxjs';
 import { API_BASE_URL } from '../core/api.config';
 import { AuthService } from '../core/auth.service';
 
-/** Timeout customizado por requisição (ms). Usado pelo timeoutErrorInterceptor. */
 export const CUSTOM_TIMEOUT_MS = new HttpContextToken<number | null>(() => null);
 
 export interface CategoriaInsight {
@@ -71,7 +70,7 @@ export class InsightsService {
     return this.http.post<RecomendacaoResponse>(
       `${API_BASE_URL}/ia/recomendacoes?meses_projetados=${mesesProjetados}&janela_meses=${janelaMeses}`,
       {},
-      { context: new HttpContext().set(CUSTOM_TIMEOUT_MS, 60_000) } // 60s para a IA ter tempo de responder
+      { context: new HttpContext().set(CUSTOM_TIMEOUT_MS, 60_000) }
     );
   }
 
@@ -86,27 +85,59 @@ export class InsightsService {
       throw new Error('Você precisa estar logado para baixar o relatório.');
     }
 
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${token}`
-    });
+    const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
 
-    const blob = await firstValueFrom(
-      this.http.get(this.urlRelatorio(), {
-        headers,
-        responseType: 'blob'
+    try {
+      // Tenta baixar como blob (download direto)
+      const blob = await firstValueFrom(
+        this.http.get(this.urlRelatorio(), { headers, responseType: 'blob' })
+      );
+
+      // Verifica se a resposta é realmente um PDF
+      if (blob.type === 'application/pdf' || blob.size > 100) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 2000);
+      } else {
+        // Fallback: abre em nova aba com o token na URL
+        this.abrirPdfNovaAba(token);
+      }
+    } catch {
+      // Fallback: abre em nova aba
+      this.abrirPdfNovaAba(token);
+    }
+  }
+
+  /** Fallback: abre o PDF em nova aba usando Authorization header via fetch + blob URL */
+  private abrirPdfNovaAba(token: string): void {
+    const url = this.urlRelatorio();
+    // Usa fetch nativo para suportar headers em nova aba
+    fetch(url, { headers: { Authorization: `Bearer ${token}` } })
+      .then(r => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.blob();
       })
-    );
-
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-
-    setTimeout(() => URL.revokeObjectURL(url), 1500);
+      .then(blob => {
+        const blobUrl = URL.createObjectURL(blob);
+        const win = window.open(blobUrl, '_blank');
+        // Se o popup foi bloqueado, força download
+        if (!win) {
+          const a = document.createElement('a');
+          a.href = blobUrl;
+          a.download = 'relatorio_ecototally.pdf';
+          a.click();
+        }
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
+      })
+      .catch(() => {
+        // Último recurso: navega direto (sem header, mas abre o endpoint)
+        window.open(url, '_blank');
+      });
   }
 }

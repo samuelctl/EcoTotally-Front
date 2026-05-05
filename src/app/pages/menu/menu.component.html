@@ -1,7 +1,7 @@
 <main class="eco-page eco-fade-in">
   <header class="menu__top">
     <div>
-      <p class="menu__hi">Olá,</p>
+      <p class="menu__hi">{{ t()('menu_hi') }}</p>
       <h1 class="menu__nome">{{ nome() }}</h1>
     </div>
     <img src="logo-ecototally.png" alt="" class="menu__logo" />
@@ -10,38 +10,43 @@
   <section class="menu__hero eco-card">
     <div class="menu__hero-icon">🌱</div>
     <div>
-      <h2>Seu impacto, em tempo real</h2>
-      <p>Atualizado automaticamente a cada 10s.</p>
+      <h2>{{ t()('menu_impact') }}</h2>
+      <p>{{ t()('menu_updated') }}</p>
     </div>
   </section>
 
   <section class="menu__stats">
     <div class="eco-card menu__stat">
-      <span class="menu__stat-label">Consumos</span>
+      <span class="menu__stat-label">{{ t()('menu_consumos') }}</span>
       <strong class="menu__stat-value">{{ totalConsumos() }}</strong>
     </div>
     <div class="eco-card menu__stat">
-      <span class="menu__stat-label">Simulações</span>
+      <span class="menu__stat-label">{{ t()('menu_simulacoes') }}</span>
       <strong class="menu__stat-value">{{ totalSimulacoes() }}</strong>
     </div>
     <div class="eco-card menu__stat menu__stat--wide">
-      <span class="menu__stat-label">Gasto total acumulado</span>
+      <span class="menu__stat-label">{{ t()('menu_gasto') }}</span>
       <strong class="menu__stat-value">R$ {{ somaGasto() | number:'1.2-2' }}</strong>
     </div>
   </section>
 
   <!-- ===== Metas ===== -->
   <div class="menu__sec-head">
-    <h3 class="menu__section">Metas</h3>
-    <a routerLink="/metas" class="menu__sec-link">Ver todas →</a>
+    <h3 class="menu__section">{{ t()('menu_metas') }}</h3>
+    <a routerLink="/metas" class="menu__sec-link">{{ t()('menu_ver_todas') }}</a>
   </div>
 
-  @if (metas().length === 0) {
+  @if (carregando() && metas().length === 0) {
+    <div class="eco-card menu__metas-skeleton">
+      <div class="skeleton-line"></div>
+      <div class="skeleton-line short"></div>
+    </div>
+  } @else if (metas().length === 0) {
     <a routerLink="/metas" class="eco-card menu__metas-empty">
       <span style="font-size:24px;">🎯</span>
       <div>
-        <strong>Nenhuma meta criada</strong>
-        <small>Defina limites de gastos e acompanhe seu progresso</small>
+        <strong>{{ t()('menu_sem_meta') }}</strong>
+        <small>{{ t()('menu_sem_meta_sub') }}</small>
       </div>
     </a>
   } @else {
@@ -62,42 +67,42 @@
   }
 
   <!-- ===== Atalhos ===== -->
-  <h3 class="menu__section">Atalhos</h3>
+  <h3 class="menu__section">{{ t()('menu_atalhos') }}</h3>
   <nav class="menu__grid">
     <a routerLink="/consumo" class="eco-card menu__tile">
       <span class="menu__tile-icon">📊</span>
-      <strong>Consumo</strong>
-      <small>Registre seus gastos</small>
+      <strong>{{ t()('menu_tile_consumo') }}</strong>
+      <small>{{ t()('menu_tile_consumo_s') }}</small>
     </a>
     <a routerLink="/metas" class="eco-card menu__tile">
       <span class="menu__tile-icon">🎯</span>
-      <strong>Metas</strong>
-      <small>Defina limites</small>
+      <strong>{{ t()('menu_tile_metas') }}</strong>
+      <small>{{ t()('menu_tile_metas_s') }}</small>
     </a>
     <a routerLink="/simulacao" class="eco-card menu__tile">
       <span class="menu__tile-icon">⚡</span>
-      <strong>Simular</strong>
-      <small>Calcule impactos</small>
+      <strong>{{ t()('menu_tile_simular') }}</strong>
+      <small>{{ t()('menu_tile_simular_s') }}</small>
     </a>
     <a routerLink="/graficos" class="eco-card menu__tile">
       <span class="menu__tile-icon">📈</span>
-      <strong>Gráficos</strong>
-      <small>Visualize tendências</small>
+      <strong>{{ t()('menu_tile_graficos') }}</strong>
+      <small>{{ t()('menu_tile_graficos_s') }}</small>
     </a>
     <a routerLink="/insights" class="eco-card menu__tile">
       <span class="menu__tile-icon">💡</span>
-      <strong>Insights</strong>
-      <small>Recomendações IA</small>
+      <strong>{{ t()('menu_tile_insights') }}</strong>
+      <small>{{ t()('menu_tile_insights_s') }}</small>
     </a>
     <a routerLink="/mapa" class="eco-card menu__tile">
       <span class="menu__tile-icon">🗺️</span>
-      <strong>Mapa</strong>
-      <small>Pontos de reciclagem</small>
+      <strong>{{ t()('menu_tile_mapa') }}</strong>
+      <small>{{ t()('menu_tile_mapa_s') }}</small>
     </a>
     <a routerLink="/perfil" class="eco-card menu__tile">
       <span class="menu__tile-icon">👤</span>
-      <strong>Perfil</strong>
-      <small>Editar dados</small>
+      <strong>{{ t()('menu_tile_perfil') }}</strong>
+      <small>{{ t()('menu_tile_perfil_s') }}</small>
     </a>
   </nav>
 </main>

@@ -5,6 +5,7 @@ import { Subscription, forkJoin, switchMap } from 'rxjs';
 import { AuthService } from '../../core/auth.service';
 import { POLL_INTERVAL_MS } from '../../core/api.config';
 import { createSmartRefresh$ } from '../../core/smart-refresh';
+import { LanguageService } from '../../core/language.service';
 import { ConsumoService } from '../../services/consumo.service';
 import { SimulacaoService } from '../../services/simulacao.service';
 import { MetaService } from '../../services/meta.service';
@@ -30,6 +31,9 @@ export class MenuComponent implements OnInit, OnDestroy {
   private consumoSvc = inject(ConsumoService);
   private simSvc = inject(SimulacaoService);
   private metaSvc = inject(MetaService);
+  langSvc = inject(LanguageService);
+
+  t = this.langSvc.t;
 
   nome = signal(this.auth.getNome());
   consumos = signal<ConsumoResponse[]>([]);
@@ -73,7 +77,7 @@ export class MenuComponent implements OnInit, OnDestroy {
 
     this.simSvc.listar().subscribe({
       next: (s) => this.totalSimulacoes.set(s.length),
-      error: () => { /* silencioso */ }
+      error: () => {}
     });
   }
 

@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostListener, inject, signal } from '@angular/core';
+import { Component, HostListener, computed, inject, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { LanguageService } from '../../core/language.service';
 
 interface NavItem {
   key: string;
-  label: string;
+  labelKey: string;
   route: string;
   icon: string;
 }
@@ -13,12 +14,17 @@ interface NavItem {
 const STORAGE_KEY = 'eco_nav_visivel';
 
 const PUBLIC_PREFIXES = [
-  '/login',
-  '/cadastro',
-  '/esqueci-senha',
-  '/redefinir-senha',
-  '/privacidade',
-  '/termos'
+  '/login', '/cadastro', '/esqueci-senha', '/redefinir-senha', '/privacidade', '/termos'
+];
+
+const NAV_ITEMS: NavItem[] = [
+  { key: 'menu',         labelKey: 'nav_home',     route: '/menu',          icon: 'home' },
+  { key: 'consumo',      labelKey: 'nav_consumo',  route: '/consumo',       icon: 'file' },
+  { key: 'simulacao',    labelKey: 'nav_simular',  route: '/simulacao',     icon: 'zap' },
+  { key: 'graficos',     labelKey: 'nav_graficos', route: '/graficos',      icon: 'chart' },
+  { key: 'insights',     labelKey: 'nav_insights', route: '/insights',      icon: 'bulb' },
+  { key: 'mapa',         labelKey: 'nav_mapa',     route: '/mapa',          icon: 'map' },
+  { key: 'configuracoes',labelKey: 'nav_config',   route: '/configuracoes', icon: 'settings' },
 ];
 
 @Component({
@@ -30,19 +36,16 @@ const PUBLIC_PREFIXES = [
 })
 export class BottomNavComponent {
   private router = inject(Router);
-
-  readonly itens: NavItem[] = [
-    { key: 'menu', label: 'Início', route: '/menu', icon: 'home' },
-    { key: 'consumo', label: 'Consumo', route: '/consumo', icon: 'file' },
-    { key: 'simulacao', label: 'Simular', route: '/simulacao', icon: 'zap' },
-    { key: 'graficos', label: 'Gráficos', route: '/graficos', icon: 'chart' },
-    { key: 'insights', label: 'Insights', route: '/insights', icon: 'bulb' },
-    { key: 'mapa', label: 'Mapa', route: '/mapa', icon: 'map' },
-    { key: 'configuracoes', label: 'Config', route: '/configuracoes', icon: 'settings' }
-  ];
+  private langSvc = inject(LanguageService);
 
   readonly visivel = signal<boolean>(this.loadVisible());
   readonly currentPath = signal<string>(this.router.url);
+
+  /** Itens com label traduzida — recalcula quando idioma muda */
+  readonly itens = computed(() => {
+    const t = this.langSvc.t();
+    return NAV_ITEMS.map(i => ({ ...i, label: t(i.labelKey) }));
+  });
 
   private touchStartY = 0;
   private touchStartX = 0;
@@ -58,49 +61,36 @@ export class BottomNavComponent {
 
   get rotaPublica(): boolean {
     const url = this.currentPath().split('?')[0].split('#')[0];
-
     return PUBLIC_PREFIXES.some((p) => url.startsWith(p)) || url === '/';
   }
 
   isAtivo(route: string): boolean {
-    const url = this.currentPath().split('?')[0].split('#')[0];
-
-    return url === route;
+    return this.currentPath().split('?')[0].split('#')[0] === route;
   }
 
-  itensVisiveis(): NavItem[] {
-    return this.itens.filter((item) => !this.isAtivo(item.route));
+  itensVisiveis() {
+    return this.itens().filter((item) => !this.isAtivo(item.route));
   }
 
   toggle(): void {
     const novo = !this.visivel();
     this.visivel.set(novo);
-
-    try {
-      localStorage.setItem(STORAGE_KEY, novo ? '1' : '0');
-    } catch {}
+    try { localStorage.setItem(STORAGE_KEY, novo ? '1' : '0'); } catch {}
   }
 
   private loadVisible(): boolean {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-
       if (raw === null) return true;
-
       return raw === '1';
-    } catch {
-      return true;
-    }
+    } catch { return true; }
   }
 
   @HostListener('window:touchstart', ['$event'])
   onTouchStart(ev: TouchEvent): void {
     if (this.rotaPublica) return;
-
     const t = ev.touches[0];
-
     if (!t) return;
-
     this.touchStartY = t.clientY;
     this.touchStartX = t.clientX;
     this.touching = true;
@@ -109,32 +99,19 @@ export class BottomNavComponent {
   @HostListener('window:touchend', ['$event'])
   onTouchEnd(ev: TouchEvent): void {
     if (!this.touching || this.rotaPublica) return;
-
     this.touching = false;
-
     const t = ev.changedTouches[0];
-
     if (!t) return;
-
     const dy = t.clientY - this.touchStartY;
     const dx = Math.abs(t.clientX - this.touchStartX);
-
     if (dx > 60 || Math.abs(dy) < 55) return;
-
     if (this.touchStartY < window.innerHeight * 0.6) return;
-
     if (dy > 0 && this.visivel()) {
       this.visivel.set(false);
-
-      try {
-        localStorage.setItem(STORAGE_KEY, '0');
-      } catch {}
+      try { localStorage.setItem(STORAGE_KEY, '0'); } catch {}
     } else if (dy < 0 && !this.visivel()) {
       this.visivel.set(true);
-
-      try {
-        localStorage.setItem(STORAGE_KEY, '1');
-      } catch {}
+      try { localStorage.setItem(STORAGE_KEY, '1'); } catch {}
     }
   }
 }
