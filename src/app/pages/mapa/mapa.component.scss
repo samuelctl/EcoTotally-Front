@@ -151,3 +151,35 @@
     width: 100% !important;
   }
 }
+:host ::ng-deep .eco-map-marker {
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 999px;
+  background: #16a34a;
+  color: #fff;
+  display: grid !important;
+  place-items: center;
+  font-size: 18px;
+  line-height: 1;
+  border: 3px solid #fff;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.28);
+}
+
+:host ::ng-deep .eco-map-user-marker {
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 999px;
+  background: #ef233c;
+  color: #fff;
+  display: grid !important;
+  place-items: center;
+  font-size: 14px;
+  line-height: 1;
+  border: 3px solid #fff;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.28);
+}
+
+:host ::ng-deep .leaflet-div-icon {
+  background: transparent !important;
+  border: none !important;
+}

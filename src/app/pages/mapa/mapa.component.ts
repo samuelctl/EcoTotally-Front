@@ -6,6 +6,22 @@ import { MapaService, PontoReciclagem } from '../../services/mapa.service';
 import { describeError } from '../../core/http-helpers';
 import { LanguageService } from '../../core/language.service';
 
+const reciclagemIcon = L.divIcon({
+  className: 'eco-map-marker',
+  html: '♻',
+  iconSize: [34, 34],
+  iconAnchor: [17, 17],
+  popupAnchor: [0, -18]
+});
+
+const userIcon = L.divIcon({
+  className: 'eco-map-user-marker',
+  html: '●',
+  iconSize: [28, 28],
+  iconAnchor: [14, 14],
+  popupAnchor: [0, -14]
+});
+
 @Component({
   selector: 'app-mapa',
   standalone: true,
@@ -36,10 +52,7 @@ export class MapaComponent implements OnInit, AfterViewInit, OnDestroy {
     setTimeout(() => {
       this.initMap();
       this.carregar();
-
-      setTimeout(() => {
-        this.map?.invalidateSize();
-      }, 500);
+      setTimeout(() => this.map?.invalidateSize(), 500);
     }, 100);
   }
 
@@ -67,7 +80,7 @@ export class MapaComponent implements OnInit, AfterViewInit, OnDestroy {
       maxZoom: 19
     }).addTo(this.map);
 
-    L.marker([this.LAT, this.LON])
+    L.marker([this.LAT, this.LON], { icon: userIcon })
       .addTo(this.map)
       .bindPopup('Localização usada no teste');
 
@@ -101,7 +114,9 @@ export class MapaComponent implements OnInit, AfterViewInit, OnDestroy {
     this.markers = [];
 
     lista.forEach((p) => {
-      const marker = L.marker([p.latitude, p.longitude])
+      const marker = L.marker([p.latitude, p.longitude], {
+        icon: reciclagemIcon
+      })
         .addTo(this.map!)
         .bindPopup(`
           <strong>${p.nome || this.t()('map_point')}</strong><br>
