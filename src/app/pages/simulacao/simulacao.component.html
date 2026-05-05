@@ -1,15 +1,15 @@
 <main class="eco-page eco-fade-in">
-  <h1 class="eco-h1">Simulação</h1>
-  <p class="eco-subtitle">Calcule o impacto e o custo de uma atividade. Atualiza sozinho.</p>
+  <h1 class="eco-h1">{{ t()('sim_title') }}</h1>
+  <p class="eco-subtitle">{{ t()('sim_subtitle') }}</p>
 
   <form class="eco-card" (ngSubmit)="criar()">
-    <label class="eco-label" for="atividade">Atividade</label>
+    <label class="eco-label" for="atividade">{{ t()('sim_atividade') }}</label>
     <input id="atividade" name="atividade" class="eco-input"
-           [(ngModel)]="atividade" placeholder="Ex.: Banho de 15min" />
+           [(ngModel)]="atividade" [placeholder]="t()('sim_atividade_ph')" />
 
     <div class="eco-row" style="margin-top:14px;">
       <div>
-        <label class="eco-label" for="tipo">Tipo</label>
+        <label class="eco-label" for="tipo">{{ t()('meta_tipo') }}</label>
         <select id="tipo" name="tipo" class="eco-select" [(ngModel)]="tipo">
           @for (t of tipos; track t) { <option [value]="t">{{ t }}</option> }
         </select>
@@ -55,7 +55,7 @@
     </div>
   } @else if (itens().length === 0) {
     <div class="eco-card eco-empty">
-      Nenhuma simulação ainda. Faça a primeira ☝️
+      {{ t()('sim_empty') }} Faça a primeira ☝️
     </div>
   } @else {
     <ul class="lista">

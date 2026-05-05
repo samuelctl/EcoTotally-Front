@@ -1,16 +1,16 @@
 <main class="eco-page eco-fade-in">
-  <h1 class="eco-h1">Gráficos</h1>
-  <p class="eco-subtitle">Visualize consumos e simulações por categoria.</p>
+  <h1 class="eco-h1">{{ t()('g_title') }}</h1>
+  <p class="eco-subtitle">{{ t()('g_subtitle') }}</p>
 
   <!-- Tabs -->
   <div class="gtabs" role="tablist">
     <button type="button" class="gtabs__btn" [class.gtabs__btn--ativo]="aba() === 'consumos'"
             (click)="setAba('consumos')" role="tab">
-      📊 Consumos
+      {{ t()('g_consumos_tab') }}
     </button>
     <button type="button" class="gtabs__btn" [class.gtabs__btn--ativo]="aba() === 'simulacoes'"
             (click)="setAba('simulacoes')" role="tab">
-      ⚡ Simulações
+      {{ t()('g_simulacoes_tab') }}
     </button>
   </div>
 
@@ -18,16 +18,16 @@
     <div class="eco-card" style="text-align:center;padding:30px;"><span class="eco-spinner lg"></span></div>
   } @else if (aba() === 'consumos') {
     @if (porTipoConsumo().length === 0) {
-      <div class="eco-card eco-empty">Sem consumos ainda. Cadastre alguns para ver os gráficos.</div>
+      <div class="eco-card eco-empty">{{ t()('g_empty_consumos') }}</div>
     } @else {
       <section class="eco-card g-hero">
-        <span class="eco-label">Total geral</span>
+        <span class="eco-label">{{ t()('g_total_geral') }}</span>
         <strong class="g-hero__num">R$ {{ totalConsumos() | number:'1.2-2' }}</strong>
-        <small class="eco-muted">{{ consumos().length }} registros</small>
+        <small class="eco-muted">{{ consumos().length }} {{ t()('g_registros') }}</small>
       </section>
 
       <section class="eco-card" style="margin-top:14px;">
-        <span class="eco-label">Por categoria</span>
+        <span class="eco-label">{{ t()('g_por_categoria') }}</span>
         <div class="bars">
           @for (b of porTipoConsumo(); track b.label) {
             <div class="bar">
@@ -45,7 +45,7 @@
 
       @if (tendenciaMensal().length > 0) {
         <section class="eco-card" style="margin-top:14px;">
-          <span class="eco-label">Tendência mensal</span>
+          <span class="eco-label">{{ t()('g_tendencia_mensal') }}</span>
           <div class="trend">
             @for (m of tendenciaMensal(); track m.label) {
               <div class="trend__col">
@@ -62,16 +62,16 @@
     }
   } @else {
     @if (porTipoSimulacao().length === 0) {
-      <div class="eco-card eco-empty">Sem simulações ainda. Crie em <strong>Simulação</strong> ⚡</div>
+      <div class="eco-card eco-empty">{{ t()('g_empty_simulacoes') }}</div>
     } @else {
       <section class="eco-card g-hero g-hero--sim">
-        <span class="eco-label">Custo total simulado</span>
+        <span class="eco-label">{{ t()('g_custo_total_simulado') }}</span>
         <strong class="g-hero__num">R$ {{ totalSimulacoes() | number:'1.2-2' }}</strong>
-        <small class="eco-muted">{{ simulacoes().length }} simulações</small>
+        <small class="eco-muted">{{ simulacoes().length }} {{ t()('g_simulacoes') }}</small>
       </section>
 
       <section class="eco-card" style="margin-top:14px;">
-        <span class="eco-label">Por tipo</span>
+        <span class="eco-label">{{ t()('g_por_tipo') }}</span>
         <div class="bars">
           @for (b of porTipoSimulacao(); track b.label) {
             <div class="bar">

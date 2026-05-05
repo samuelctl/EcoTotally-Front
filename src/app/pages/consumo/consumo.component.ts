@@ -9,6 +9,7 @@ import { MetaResponse } from '../../models/meta.model';
 import { POLL_INTERVAL_MS } from '../../core/api.config';
 import { createSmartRefresh$ } from '../../core/smart-refresh';
 import { describeError } from '../../core/http-helpers';
+import { LanguageService } from '../../core/language.service';
 
 @Component({
   selector: 'app-consumo',
@@ -18,6 +19,7 @@ import { describeError } from '../../core/http-helpers';
   styleUrls: ['./consumo.component.scss']
 })
 export class ConsumoComponent implements OnInit, OnDestroy {
+  readonly t = inject(LanguageService).t;
   private svc = inject(ConsumoService);
   private metaSvc = inject(MetaService);
 

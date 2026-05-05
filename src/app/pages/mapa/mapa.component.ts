@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { MapaService, PontoReciclagem } from '../../services/mapa.service';
 import { describeError } from '../../core/http-helpers';
+import { LanguageService } from '../../core/language.service';
 
 @Component({
   selector: 'app-mapa',
@@ -11,6 +12,7 @@ import { describeError } from '../../core/http-helpers';
   styleUrls: ['./mapa.component.scss']
 })
 export class MapaComponent implements OnInit {
+  readonly t = inject(LanguageService).t;
   private svc = inject(MapaService);
 
   pontos = signal<PontoReciclagem[]>([]);

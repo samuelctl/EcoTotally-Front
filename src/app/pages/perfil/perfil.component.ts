@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 import { UsuarioService } from '../../services/usuario.service';
 import { describeError } from '../../core/http-helpers';
+import { LanguageService } from '../../core/language.service';
 
 @Component({
   selector: 'app-perfil',
@@ -14,6 +15,7 @@ import { describeError } from '../../core/http-helpers';
   styleUrls: ['./perfil.component.scss']
 })
 export class PerfilComponent implements OnInit {
+  readonly t = inject(LanguageService).t;
   private auth = inject(AuthService);
   private usuario = inject(UsuarioService);
   private router = inject(Router);

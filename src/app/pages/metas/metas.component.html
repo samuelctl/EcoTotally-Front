@@ -1,9 +1,9 @@
 <main class="eco-page eco-fade-in">
   <header class="metas__header">
     <div>
-      <h1 class="eco-h1">Metas</h1>
+      <h1 class="eco-h1">{{ t()('meta_title') }}</h1>
       <p class="eco-subtitle">
-        Defina limites de gastos e acompanhe o progresso em tempo real.
+        {{ t()('meta_subtitle') }}
       </p>
     </div>
 
@@ -12,7 +12,7 @@
         type="button"
         class="metas__novo"
         (click)="abrirNova()"
-        aria-label="Nova meta"
+        [attr.aria-label]="t()('meta_new_aria')"
       >
         +
       </button>
@@ -22,13 +22,13 @@
   @if (formAberto()) {
     <section class="eco-card metas__form eco-fade-in">
       <div class="metas__form-head">
-        <strong>{{ modoEdicao() ? "Editar meta" : "Nova meta" }}</strong>
+        <strong>{{ modoEdicao() ? t()('meta_edit') : t()('meta_new') }}</strong>
 
         <button
           type="button"
           class="metas__fechar"
           (click)="fecharForm()"
-          aria-label="Fechar formulário"
+          [attr.aria-label]="t()('meta_close_aria')"
         >
           ×
         </button>
@@ -36,7 +36,7 @@
 
       <div class="metas__grid">
         <div>
-          <label class="eco-label" for="tipo-meta">Tipo</label>
+          <label class="eco-label" for="tipo-meta">{{ t()('meta_tipo') }}</label>
           <select
             id="tipo-meta"
             name="tipo-meta"
@@ -50,7 +50,7 @@
         </div>
 
         <div>
-          <label class="eco-label" for="valor-obj">Valor objetivo (R$)</label>
+          <label class="eco-label" for="valor-obj">{{ t()('meta_objetivo') }}</label>
           <input
             id="valor-obj"
             name="valor-obj"
@@ -67,7 +67,7 @@
 
       <div class="metas__grid metas__grid--dates">
         <div>
-          <label class="eco-label" for="data-ini">Início</label>
+          <label class="eco-label" for="data-ini">{{ t()('meta_inicio') }}</label>
           <input
             id="data-ini"
             name="data-ini"
@@ -78,7 +78,7 @@
         </div>
 
         <div>
-          <label class="eco-label" for="data-fim">Fim</label>
+          <label class="eco-label" for="data-fim">{{ t()('meta_fim') }}</label>
           <input
             id="data-fim"
             name="data-fim"
@@ -102,7 +102,7 @@
         @if (salvando()) {
           <span class="eco-spinner"></span>
         } @else {
-          💾 Salvar meta
+          {{ t()('meta_save') }}
         }
       </button>
     </section>
@@ -114,8 +114,8 @@
     </div>
   } @else if (metasComProgresso().length === 0) {
     <div class="eco-card eco-empty">
-      Nenhuma meta criada ainda.<br />
-      Crie a primeira no botão <strong>+</strong> 👆
+      {{ t()('meta_empty') }}<br />
+      {{ t()('meta_empty_sub') }}
     </div>
   } @else {
     <ul class="metas__lista">
@@ -133,7 +133,7 @@
               <strong>{{ mp.meta.tipo_meta }}</strong>
               <small>
                 {{ mp.meta.data_inicio }} → {{ mp.meta.data_fim }} ·
-                {{ mp.diasRestantes }}d restantes
+                {{ mp.diasRestantes }}{{ t()('meta_days_left') }}
               </small>
             </div>
 
@@ -142,7 +142,7 @@
                 type="button"
                 class="metas__acao"
                 (click)="abrirEdicao(mp.meta)"
-                aria-label="Editar meta"
+                [attr.aria-label]="t()('meta_edit_aria')"
               >
                 ✎
               </button>
@@ -151,7 +151,7 @@
                 type="button"
                 class="metas__acao metas__acao--del"
                 (click)="deletar(mp.meta)"
-                aria-label="Excluir meta"
+                [attr.aria-label]="t()('meta_delete_aria')"
               >
                 ×
               </button>
@@ -160,14 +160,14 @@
 
           <div class="metas__valores">
             <span>
-              <small>Acumulado</small>
+              <small>{{ t()('meta_acumulado') }}</small>
               <strong>R$ {{ mp.acumulado | number: "1.2-2" }}</strong>
             </span>
 
             <span class="metas__valores-sep">/</span>
 
             <span class="metas__valores-obj">
-              <small>Objetivo</small>
+              <small>{{ t()('meta_objetivo_label') }}</small>
               <strong>
                 R$ {{ mp.meta.valor_objetivo | number: "1.2-2" }}
               </strong>
@@ -189,17 +189,17 @@
 
           <small class="metas__status">
             @if (mp.status === "estourada") {
-              ⚠️ Meta estourada em
+              {{ t()('meta_over') }}
               <strong>
                 R$
                 {{ mp.acumulado - +mp.meta.valor_objetivo | number: "1.2-2" }}
               </strong>
             } @else if (mp.status === "atencao") {
-              🟡 Atenção: faltam
+              {{ t()('meta_attention') }}
               <strong>R$ {{ mp.restante | number: "1.2-2" }}</strong>
-              para o limite
+              {{ t()('meta_to_limit') }}
             } @else {
-              ✅ Dentro da meta — restam
+              {{ t()('meta_ok') }}
               <strong>R$ {{ mp.restante | number: "1.2-2" }}</strong>
             }
           </small>

@@ -1,40 +1,40 @@
 <main class="eco-page eco-fade-in">
-  <h1 class="eco-h1">Consumo</h1>
-  <p class="eco-subtitle">Registre e acompanhe seus consumos. Atualiza sozinho.</p>
+  <h1 class="eco-h1">{{ t()('con_title') }}</h1>
+  <p class="eco-subtitle">{{ t()('con_subtitle') }}</p>
 
   <!-- Formulário -->
   <form class="eco-card" (ngSubmit)="criar()">
     <div class="eco-row">
       <div>
-        <label class="eco-label" for="tipo">Tipo</label>
+        <label class="eco-label" for="tipo">{{ t()('con_tipo') }}</label>
         <select id="tipo" name="tipo" class="eco-select" [(ngModel)]="tipo" (ngModelChange)="onTipoChange()">
           @for (t of tipos; track t) { <option [value]="t">{{ t }}</option> }
         </select>
       </div>
       <div>
-        <label class="eco-label" for="gasto">Gasto (R$)</label>
+        <label class="eco-label" for="gasto">{{ t()('con_gasto') }}</label>
         <input id="gasto" name="gasto" class="eco-input" type="number" inputmode="decimal" step="0.01" min="0"
                [(ngModel)]="gasto" placeholder="0,00" />
       </div>
     </div>
 
-    <label class="eco-label" for="data" style="margin-top:14px;">Data</label>
+    <label class="eco-label" for="data" style="margin-top:14px;">{{ t()('con_data') }}</label>
     <input id="data" name="data" class="eco-input" type="date" [(ngModel)]="data" />
 
     <label class="eco-label" for="meta" style="margin-top:14px;">
-      Vincular a uma meta <span class="eco-muted" style="text-transform:none;letter-spacing:0;font-weight:400;font-size:11px;">(opcional)</span>
+      {{ t()('con_meta') }} <span class="eco-muted" style="text-transform:none;letter-spacing:0;font-weight:400;font-size:11px;">({{ t()('con_meta_opt') }})</span>
     </label>
     <select id="meta" name="meta" class="eco-select" [(ngModel)]="metaIdSelecionada">
-      <option [ngValue]="null">— Sem meta vinculada —</option>
+      <option [ngValue]="null">{{ t()('con_sem_meta') }}</option>
       @if (metasDoTipo().length > 0) {
-        <optgroup label="Metas de {{ tipo }}">
+        <optgroup label="{{ t()('con_metas_tipo') }} {{ tipo }}">
           @for (m of metasDoTipo(); track m.id_meta) {
             <option [ngValue]="m.id_meta">🎯 {{ m.tipo_meta }} · R$ {{ m.valor_objetivo }} (até {{ m.data_fim }})</option>
           }
         </optgroup>
       }
       @if (metas().length > metasDoTipo().length) {
-        <optgroup label="Outras metas">
+        <optgroup label="{{ t()('con_outras_metas') }}">
           @for (m of metas(); track m.id_meta) {
             @if (m.tipo_meta !== tipo) {
               <option [ngValue]="m.id_meta">{{ m.tipo_meta }} · R$ {{ m.valor_objetivo }}</option>
@@ -45,19 +45,19 @@
     </select>
     @if (metas().length === 0) {
       <small class="eco-muted" style="display:block;margin-top:6px;font-size:11px;">
-        Nenhuma meta cadastrada ainda. Crie em <strong>Metas</strong> 🎯
+        {{ t()('con_sem_metas_msg') }}
       </small>
     }
 
     @if (erro()) { <div class="eco-error">{{ erro() }}</div> }
 
     <button type="submit" class="eco-btn" style="margin-top:14px;" [disabled]="salvando()">
-      @if (salvando()) { <span class="eco-spinner"></span> } @else { + Adicionar consumo }
+      @if (salvando()) { <span class="eco-spinner"></span> } @else { {{ t()('con_add_btn') }} }
     </button>
   </form>
 
   <!-- Lista -->
-  <h2 class="lista__titulo">Histórico</h2>
+  <h2 class="lista__titulo">{{ t()('con_hist') }}</h2>
 
   @if (carregando() && itens().length === 0) {
     <div class="eco-card" style="text-align:center;padding:30px;">
@@ -65,7 +65,7 @@
     </div>
   } @else if (itens().length === 0) {
     <div class="eco-card eco-empty">
-      Nenhum consumo registrado ainda.<br>Crie o primeiro acima ☝️
+      {{ t()('con_vazio') }}
     </div>
   } @else {
     <ul class="lista">
@@ -90,7 +90,7 @@
             </small>
           </div>
           <div class="lista__valor">R$ {{ valor(item) | number:'1.2-2' }}</div>
-          <button type="button" class="lista__del" (click)="deletar(item)" aria-label="Deletar">×</button>
+          <button type="button" class="lista__del" (click)="deletar(item)" [attr.aria-label]="t()('con_delete_aria')">×</button>
         </li>
       }
     </ul>

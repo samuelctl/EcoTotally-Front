@@ -1,24 +1,24 @@
 <main class="eco-page eco-fade-in">
-  <h1 class="eco-h1">Insights</h1>
-  <p class="eco-subtitle">Projeção, comparativos e análise por IA — totalmente configurável.</p>
+  <h1 class="eco-h1">{{ t()('ins_title') }}</h1>
+  <p class="eco-subtitle">{{ t()('ins_subtitle') }}</p>
 
   <!-- Painel de configuração -->
   <section class="eco-card cfg">
     <div class="cfg__row">
       <div class="cfg__campo">
         <label class="eco-label" for="janela">
-          Janela de análise
-          <span class="cfg__valor">{{ janelaMeses() }} {{ janelaMeses() === 1 ? 'mês' : 'meses' }}</span>
+          {{ t()('ins_janela') }}
+          <span class="cfg__valor">{{ janelaMeses() }} {{ janelaMeses() === 1 ? 'mês' : t()('ins_months') }}</span>
         </label>
         <input id="janela" type="range" min="1" max="24" step="1"
                [ngModel]="janelaMeses()" (ngModelChange)="janelaMeses.set($event)" class="cfg__slider" />
-        <small class="cfg__hint">Quantos meses passados a IA usa de base</small>
+        <small class="cfg__hint">Quantos {{ t()('ins_months') }} passados a IA usa de base</small>
       </div>
 
       <div class="cfg__campo">
         <label class="eco-label" for="proj">
-          Projetar para
-          <span class="cfg__valor">{{ mesesProjetados() }} {{ mesesProjetados() === 1 ? 'mês' : 'meses' }}</span>
+          {{ t()('ins_projecao') }}
+          <span class="cfg__valor">{{ mesesProjetados() }} {{ mesesProjetados() === 1 ? 'mês' : t()('ins_months') }}</span>
         </label>
         <input id="proj" type="range" min="1" max="24" step="1"
                [ngModel]="mesesProjetados()" (ngModelChange)="mesesProjetados.set($event)" class="cfg__slider" />
@@ -27,7 +27,7 @@
     </div>
 
     <button type="button" class="eco-btn eco-btn-ghost cfg__aplicar" (click)="carregar()" [disabled]="carregando()">
-      🔄 Aplicar e recarregar
+      🔄 {{ t()('ins_update') }}
     </button>
   </section>
 
@@ -35,13 +35,13 @@
     <div class="eco-card" style="text-align:center;padding:30px;margin-top:14px;"><span class="eco-spinner lg"></span></div>
   } @else if (erro() && !dados()) {
     <div class="eco-error">{{ erro() }}</div>
-    <button class="eco-btn eco-btn-ghost" type="button" (click)="carregar()" style="margin-top:14px;">Tentar de novo</button>
+    <button class="eco-btn eco-btn-ghost" type="button" (click)="carregar()" style="margin-top:14px;">{{ t()('ins_update') }}</button>
   } @else if (dados()) {
     @let d = dados()!;
 
     <section class="eco-card score eco-fade-in">
       <div class="score__head">
-        <span class="eco-label">Seu Score</span>
+        <span class="eco-label">Score</span>
         <strong class="score__valor">{{ d.score.valor }}</strong>
         <small class="score__nivel">{{ d.score.nivel }}</small>
       </div>
@@ -53,17 +53,17 @@
     </section>
 
     <section class="eco-card hero-prev eco-fade-in">
-      <span class="eco-label">Previsão Total ({{ d.meses_projetados }} meses)</span>
+      <span class="eco-label">{{ t()('ins_forecast') }} ({{ d.meses_projetados }} {{ t()('ins_months') }})</span>
       <strong class="hero-prev__num">R$ {{ d.previsao_total | number:'1.2-2' }}</strong>
       <div class="hero-prev__chips">
         <span>📍 {{ d.regiao }}</span>
-        <span>🪟 {{ d.janela_meses_analisada }} meses analisados</span>
-        <span>🔭 {{ d.meses_projetados }} meses projetados</span>
+        <span>🪟 {{ d.janela_meses_analisada }} {{ t()('ins_analyzed') }}</span>
+        <span>🔭 {{ d.meses_projetados }} {{ t()('ins_projected') }}</span>
       </div>
     </section>
 
     @if (categorias().length > 0) {
-      <h2 class="lista__titulo">Por categoria</h2>
+      <h2 class="lista__titulo">{{ t()('ins_by_category') }}</h2>
       <ul class="cat-lista">
         @for (c of categorias(); track c.nome) {
           <li class="eco-card cat-item eco-fade-in">
@@ -72,7 +72,7 @@
               <strong>{{ c.nome }}</strong>
               <small>
                 {{ iconeTendencia(c.info.tendencia) }} {{ c.info.tendencia }}
-                · último mês: {{ c.info.ultimo_mes | number:'1.0-2' }}
+                · {{ t()('ins_last_month') }}: {{ c.info.ultimo_mes | number:'1.0-2' }}
                 @if (c.info.crescimento_percentual !== undefined) {
                   · {{ c.info.crescimento_percentual >= 0 ? '+' : '' }}{{ c.info.crescimento_percentual | number:'1.0-1' }}%
                 }
@@ -80,7 +80,7 @@
             </div>
             <div class="cat-item__valor">
               <strong>{{ c.info.total_projetado | number:'1.0-2' }}</strong>
-              <small>projetado</small>
+              <small>{{ t()('ins_projected_label') }}</small>
             </div>
           </li>
         }
@@ -89,10 +89,10 @@
 
     <div class="acoes">
       <button class="eco-btn" type="button" (click)="pedirIa()" [disabled]="carregandoIa()">
-        @if (carregandoIa()) { <span class="eco-spinner"></span> Analisando… } @else { 🤖 Pedir análise IA }
+        @if (carregandoIa()) { <span class="eco-spinner"></span> {{ t()('ins_analyzing') }} } @else { {{ t()('ins_ask_ai') }} }
       </button>
       <button class="eco-btn eco-btn-ghost" type="button" (click)="baixarRelatorio()" [disabled]="baixandoPdf()">
-        @if (baixandoPdf()) { <span class="eco-spinner"></span> Gerando PDF… } @else { 📄 Baixar PDF }
+        @if (baixandoPdf()) { <span class="eco-spinner"></span> {{ t()('ins_generating_pdf') }} } @else { {{ t()('ins_download_pdf') }} }
       </button>
     </div>
 
@@ -103,25 +103,25 @@
         <header class="ia-card__head">
           <div class="ia-card__avatar">🤖</div>
           <div>
-            <strong>Análise da IA</strong>
-            <small>Urgência: {{ iconeImpacto(ia.nivel_urgencia) }} {{ ia.nivel_urgencia }}</small>
+            <strong>{{ t()('ins_ai_analysis') }}</strong>
+            <small>{{ t()('ins_urgency') }}: {{ iconeImpacto(ia.nivel_urgencia) }} {{ ia.nivel_urgencia }}</small>
           </div>
         </header>
 
         <div class="ia__secao">
-          <h3 class="ia__titulo">📋 Diagnóstico Geral</h3>
+          <h3 class="ia__titulo">{{ t()('ins_diagnosis') }}</h3>
           <p class="ia__paragrafo">{{ ia.diagnostico_geral }}</p>
         </div>
 
         <div class="ia__destaque">
-          💰 Economia estimada: <strong>R$ {{ ia.economia_estimativa_mensal | number:'1.2-2' }}/mês</strong>
+          {{ t()('ins_savings') }} <strong>R$ {{ ia.economia_estimativa_mensal | number:'1.2-2' }}/mês</strong>
         </div>
 
         <div class="ia__alerta">
           📍 {{ ia.alerta_amostra_regional }}
         </div>
 
-        <h3 class="ia__titulo">💡 Recomendações</h3>
+        <h3 class="ia__titulo">{{ t()('ins_recommendations') }}</h3>
         @for (rec of ia.recomendacoes; track rec.titulo) {
           <div class="ia__rec">
             <div class="ia__rec-head">

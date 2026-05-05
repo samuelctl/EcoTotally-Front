@@ -7,6 +7,7 @@ import { createSmartRefresh$ } from '../../core/smart-refresh';
 import { SimulacaoService } from '../../services/simulacao.service';
 import { CriarSimulacaoRequest, SimulacaoResponse, getSimulacaoId } from '../../models/simulacao.model';
 import { describeError } from '../../core/http-helpers';
+import { LanguageService } from '../../core/language.service';
 
 // Tarifas médias de referência (Brasil) – usadas só pra estimar custo no cliente
 // quando o backend não retorna `custo`/`valor_calculado`.
@@ -23,6 +24,7 @@ const TARIFA = {
   styleUrls: ['./simulacao.component.scss']
 })
 export class SimulacaoComponent implements OnInit, OnDestroy {
+  readonly t = inject(LanguageService).t;
   private svc = inject(SimulacaoService);
 
   readonly tipos = ['Energia', 'Agua'];

@@ -5,6 +5,7 @@ import { Subscription, forkJoin, switchMap } from 'rxjs';
 import { POLL_INTERVAL_MS } from '../../core/api.config';
 import { createSmartRefresh$ } from '../../core/smart-refresh';
 import { describeError } from '../../core/http-helpers';
+import { LanguageService } from '../../core/language.service';
 import { MetaService } from '../../services/meta.service';
 import { ConsumoService } from '../../services/consumo.service';
 import { MetaCreateRequest, MetaResponse, metaValorObjetivo } from '../../models/meta.model';
@@ -28,6 +29,7 @@ interface MetaComProgresso {
   styleUrls: ['./metas.component.scss']
 })
 export class MetasComponent implements OnInit, OnDestroy {
+  readonly t = inject(LanguageService).t;
   private metaSvc = inject(MetaService);
   private consumoSvc = inject(ConsumoService);
   private notifSvc = inject(NotificacaoService);

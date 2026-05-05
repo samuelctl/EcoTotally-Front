@@ -3,6 +3,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { InsightsService, InsightsCompleto, RecomendacaoResponse } from '../../services/insights.service';
 import { describeError } from '../../core/http-helpers';
+import { LanguageService } from '../../core/language.service';
 
 interface AnaliseIA {
   diagnostico_geral: string;
@@ -25,6 +26,7 @@ interface AnaliseIA {
   styleUrls: ['./insights.component.scss']
 })
 export class InsightsComponent implements OnInit {
+  readonly t = inject(LanguageService).t;
   private svc = inject(InsightsService);
 
   dados = signal<InsightsCompleto | null>(null);

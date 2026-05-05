@@ -8,6 +8,7 @@ import { SimulacaoResponse } from '../../models/simulacao.model';
 import { POLL_INTERVAL_MS } from '../../core/api.config';
 import { createSmartRefresh$ } from '../../core/smart-refresh';
 import { describeError } from '../../core/http-helpers';
+import { LanguageService } from '../../core/language.service';
 
 interface Barra { label: string; valor: number; cor: string; sub?: string; }
 
@@ -26,6 +27,7 @@ const TARIFA_SIM = {
   styleUrls: ['./graficos.component.scss']
 })
 export class GraficosComponent implements OnInit, OnDestroy {
+  readonly t = inject(LanguageService).t;
   private cSvc = inject(ConsumoService);
   private sSvc = inject(SimulacaoService);
 

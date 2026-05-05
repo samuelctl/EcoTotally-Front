@@ -1,7 +1,8 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { catchError, throwError } from 'rxjs';
+import { catchError, from, switchMap, throwError } from 'rxjs';
+import { AuthService } from './auth.service';
 
 function isPublicRoute(url: string, method: string): boolean {
   let path = '';
@@ -15,20 +16,20 @@ function isPublicRoute(url: string, method: string): boolean {
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
+  const auth = inject(AuthService);
 
   if (isPublicRoute(req.url, req.method.toUpperCase())) return next(req);
 
-  const token = localStorage.getItem('eco_access_token');
-  const authReq = token
-    ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
-    : req;
-
-  return next(authReq).pipe(
+  return from(auth.getTokenAsync()).pipe(
+    switchMap((token) => {
+      const authReq = token
+        ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
+        : req;
+      return next(authReq);
+    }),
     catchError((err) => {
       if (err?.status === 401) {
-        // Limpa token e redireciona para login com aviso de sessão expirada
-        localStorage.removeItem('eco_access_token');
-        localStorage.removeItem('eco_token_type');
+        auth.logout();
         router.navigate(['/login'], { queryParams: { expirado: '1' } });
       }
       return throwError(() => err);

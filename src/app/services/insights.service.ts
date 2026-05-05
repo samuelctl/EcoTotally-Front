@@ -2,6 +2,9 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpContext, HttpContextToken } from '@angular/common/http';
 import { Observable, firstValueFrom } from 'rxjs';
 import { API_BASE_URL } from '../core/api.config';
+import { Capacitor } from '@capacitor/core';
+import { Directory, Filesystem } from '@capacitor/filesystem';
+import { Share } from '@capacitor/share';
 import { AuthService } from '../core/auth.service';
 
 export const CUSTOM_TIMEOUT_MS = new HttpContextToken<number | null>(() => null);
@@ -79,65 +82,69 @@ export class InsightsService {
   }
 
   async baixarRelatorioPdf(filename = 'relatorio_ecototally.pdf'): Promise<void> {
-    const token = this.auth.getToken();
+    const token = await this.auth.getTokenAsync();
 
     if (!token) {
       throw new Error('Você precisa estar logado para baixar o relatório.');
     }
 
     const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+    const blob = await firstValueFrom(
+      this.http.get(this.urlRelatorio(), { headers, responseType: 'blob' })
+    );
 
-    try {
-      // Tenta baixar como blob (download direto)
-      const blob = await firstValueFrom(
-        this.http.get(this.urlRelatorio(), { headers, responseType: 'blob' })
-      );
-
-      // Verifica se a resposta é realmente um PDF
-      if (blob.type === 'application/pdf' || blob.size > 100) {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        a.style.display = 'none';
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        setTimeout(() => URL.revokeObjectURL(url), 2000);
-      } else {
-        // Fallback: abre em nova aba com o token na URL
-        this.abrirPdfNovaAba(token);
-      }
-    } catch {
-      // Fallback: abre em nova aba
-      this.abrirPdfNovaAba(token);
+    if (!(blob.type === 'application/pdf' || blob.size > 100)) {
+      throw new Error('O servidor não retornou um PDF válido.');
     }
+
+    if (Capacitor.isNativePlatform()) {
+      await this.salvarECompartilharPdf(blob, filename);
+      return;
+    }
+
+    this.baixarPdfWeb(blob, filename);
   }
 
-  /** Fallback: abre o PDF em nova aba usando Authorization header via fetch + blob URL */
-  private abrirPdfNovaAba(token: string): void {
-    const url = this.urlRelatorio();
-    // Usa fetch nativo para suportar headers em nova aba
-    fetch(url, { headers: { Authorization: `Bearer ${token}` } })
-      .then(r => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        return r.blob();
-      })
-      .then(blob => {
-        const blobUrl = URL.createObjectURL(blob);
-        const win = window.open(blobUrl, '_blank');
-        // Se o popup foi bloqueado, força download
-        if (!win) {
-          const a = document.createElement('a');
-          a.href = blobUrl;
-          a.download = 'relatorio_ecototally.pdf';
-          a.click();
-        }
-        setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
-      })
-      .catch(() => {
-        // Último recurso: navega direto (sem header, mas abre o endpoint)
-        window.open(url, '_blank');
-      });
+  private baixarPdfWeb(blob: Blob, filename: string): void {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
   }
+
+  private async salvarECompartilharPdf(blob: Blob, filename: string): Promise<void> {
+    const base64Data = await this.blobToBase64(blob);
+
+    const saved = await Filesystem.writeFile({
+      path: filename,
+      data: base64Data,
+      directory: Directory.Cache,
+      recursive: true
+    });
+
+    await Share.share({
+      title: 'Relatório EcoTotally',
+      text: 'Relatório EcoTotally em PDF',
+      url: saved.uri,
+      dialogTitle: 'Salvar ou compartilhar relatório'
+    });
+  }
+
+  private blobToBase64(blob: Blob): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = () => reject(new Error('Não foi possível ler o PDF.'));
+      reader.onload = () => {
+        const result = String(reader.result || '');
+        resolve(result.includes(',') ? result.split(',')[1] : result);
+      };
+      reader.readAsDataURL(blob);
+    });
+  }
+
 }
