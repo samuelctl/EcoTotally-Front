@@ -20,10 +20,7 @@
     "@capacitor/android": "^8.3.1",
     "@capacitor/cli": "^8.3.1",
     "@capacitor/core": "^8.3.1",
-<<<<<<< HEAD
     "@capacitor/geolocation": "^8.2.0",
-=======
->>>>>>> 17c1a5bc4b8b4e430a1214f2f48067a97edac01c
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.10"
@@ -33,10 +30,7 @@
     "@angular/cli": "^18.2.0",
     "@angular/compiler-cli": "^18.2.0",
     "@types/node": "^20.10.0",
-<<<<<<< HEAD
-    "typescript": "5.5"
-=======
+    "typescript": "5.5",
     "typescript": "~5.5.0"
->>>>>>> 17c1a5bc4b8b4e430a1214f2f48067a97edac01c
   }
 }
