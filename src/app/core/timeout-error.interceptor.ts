@@ -24,8 +24,4 @@ export const timeoutErrorInterceptor: HttpInterceptorFn = (req, next) => {
       return throwError(() => err);
     })
   );
-<<<<<<< HEAD
 };
-=======
-};
->>>>>>> 17c1a5bc4b8b4e430a1214f2f48067a97edac01c
