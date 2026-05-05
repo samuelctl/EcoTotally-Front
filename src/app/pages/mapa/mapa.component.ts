@@ -53,6 +53,10 @@ export class MapaComponent implements OnInit, AfterViewInit {
       attribution: '© OpenStreetMap'
     }).addTo(this.map);
 
+    setTimeout(() => {
+    this.map.invalidateSize();
+  }, 300);
+
     L.marker([this.LAT, this.LON])
       .addTo(this.map)
       .bindPopup('Localização usada no teste');
