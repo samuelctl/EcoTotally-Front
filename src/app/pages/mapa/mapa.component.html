@@ -1,12 +1,38 @@
 <main class="eco-page eco-fade-in">
   <h1 class="eco-h1">{{ t()('map_title') }}</h1>
   <p class="eco-subtitle">
-    @if (coordsUser(); as c) { {{ t()('map_near') }} ({{ c.lat | number:'1.4-4' }}, {{ c.lon | number:'1.4-4' }}) }
-    @else { {{ t()('map_default') }} }
+    @if (coordsUser(); as c) {
+      {{ t()('map_near') }} ({{ c.lat | number:'1.4-4' }}, {{ c.lon | number:'1.4-4' }})
+    } @else {
+      {{ t()('map_default') }}
+    }
   </p>
 
+  <section class="eco-card mapa__box" aria-label="Mapa com pontos de reciclagem">
+    <div class="mapa__tiles">
+      @for (tile of tiles(); track tile.url) {
+        <img class="mapa__tile" [src]="tile.url" alt="" loading="lazy" />
+      }
+    </div>
+
+    @if (coordsUser(); as c) {
+      <div class="mapa__pin mapa__pin--user" style="left:50%;top:50%;" title="Localização usada no teste"></div>
+    }
+
+    @for (m of pontosNoMapa(); track $index) {
+      <button
+        type="button"
+        class="mapa__pin mapa__pin--ponto"
+        [style.left.%]="m.left"
+        [style.top.%]="m.top"
+        [title]="m.ponto.nome || t()('map_point')"
+        (click)="abrirNoMaps(m.ponto)">
+      </button>
+    }
+  </section>
+
   @if (carregando()) {
-    <div class="eco-card" style="text-align:center;padding:30px;"><span class="eco-spinner lg"></span></div>
+    <div class="eco-card mapa__loading"><span class="eco-spinner lg"></span></div>
   } @else if (erro()) {
     <div class="eco-error">{{ erro() }}</div>
   } @else if (pontos().length === 0) {
@@ -19,8 +45,9 @@
           <div class="mapa__info">
             <strong>{{ p.nome || t()('map_point') }}</strong>
             @if (p.endereco) { <small>{{ p.endereco }}</small> }
+            <small>{{ p.latitude | number:'1.5-5' }}, {{ p.longitude | number:'1.5-5' }}</small>
             <div class="mapa__tags">
-              @for (t of tipos(p); track t) { <span class="mapa__tag">{{ t }}</span> }
+              @for (tipo of tipos(p); track tipo) { <span class="mapa__tag">{{ tipo }}</span> }
             </div>
           </div>
           <button class="eco-btn-ghost mapa__btn" type="button" (click)="abrirNoMaps(p)">{{ t()('map_routes') }}</button>
