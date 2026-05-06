@@ -2,8 +2,8 @@ import { Component, OnInit, inject } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { AuthService } from './core/auth.service';
 
-// 🔥 IMPORTA SEU MENU
-import { BottomNavComponent } from './components/bottom-nav/bottom-nav.component';
+// 🔥 CAMINHO CORRETO
+import { BottomNavComponent } from './shared/bottom-nav/bottom-nav.component';
 
 @Component({
   selector: 'app-root',
@@ -12,7 +12,7 @@ import { BottomNavComponent } from './components/bottom-nav/bottom-nav.component
   template: `
     <router-outlet></router-outlet>
 
-    <!-- 👇 menu fixo -->
+    <!-- 👇 SELETOR CORRETO -->
     <app-bottom-nav></app-bottom-nav>
   `
 })
