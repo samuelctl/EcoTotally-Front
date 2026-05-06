@@ -1,9 +1,11 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import { AuthService } from './core/auth.service';
 
 @Component({
   selector: 'app-root',
+  standalone: true,
+  imports: [RouterOutlet], // 👈 ESSA LINHA RESOLVE
   template: '<router-outlet></router-outlet>'
 })
 export class AppComponent implements OnInit {
@@ -14,7 +16,7 @@ export class AppComponent implements OnInit {
     const token = await this.auth.getToken();
 
     if (token) {
-      this.router.navigate(['/menu']); // ou home
+      this.router.navigate(['/menu']);
     } else {
       this.router.navigate(['/login']);
     }
