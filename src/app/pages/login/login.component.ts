@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
@@ -13,7 +13,7 @@ import { describeError } from '../../core/http-helpers';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   private auth = inject(AuthService);
   private usuario = inject(UsuarioService);
   private router = inject(Router);
@@ -26,6 +26,12 @@ export class LoginComponent {
   erro = signal<string | null>(null);
   sessaoExpirou = signal(this.route.snapshot.queryParamMap.get('expirado') === '1');
 
+  async ngOnInit(): Promise<void> {
+    if (!this.sessaoExpirou() && await this.auth.isLoggedInAsync()) {
+      this.router.navigate(['/menu'], { replaceUrl: true });
+    }
+  }
+
   entrar(): void {
     if (this.loading()) return;
     if (!this.email || !this.senha) {
@@ -36,8 +42,7 @@ export class LoginComponent {
     this.loading.set(true);
     this.auth.login({ email: this.email.trim(), senha: this.senha }).subscribe({
       next: () => {
-        // já navega; carrega dados do usuário em background
-        this.router.navigate(['/menu']);
+        this.router.navigate(['/menu'], { replaceUrl: true });
         this.usuario.buscarMe().subscribe({
           next: (u) => this.auth.setUsuarioLocal({
             id: u.id, nome: u.nome, email: u.email, cidade: u.cidade

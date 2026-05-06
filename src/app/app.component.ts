@@ -1,18 +1,22 @@
-import { Component, inject } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { BottomNavComponent } from './shared/bottom-nav/bottom-nav.component';
-import { ThemeService } from './core/theme.service';
+import { Component, OnInit, inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { AuthService } from './core/auth.service';
 
 @Component({
   selector: 'app-root',
-  standalone: true,
-  imports: [RouterOutlet, BottomNavComponent],
-  template: `
-    <router-outlet />
-    <app-bottom-nav />
-  `
+  template: '<router-outlet></router-outlet>'
 })
-export class AppComponent {
-  // Inicializa o tema ao carregar a aplicação
-  private theme = inject(ThemeService);
+export class AppComponent implements OnInit {
+  private auth = inject(AuthService);
+  private router = inject(Router);
+
+  async ngOnInit() {
+    const token = await this.auth.getToken();
+
+    if (token) {
+      this.router.navigate(['/menu']); // ou home
+    } else {
+      this.router.navigate(['/login']);
+    }
+  }
 }

@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, from, map, switchMap } from 'rxjs';
 import { Preferences } from '@capacitor/preferences';
 import { API_BASE_URL } from './api.config';
 
@@ -25,9 +25,9 @@ const KEYS = {
 export class AuthService {
   private http = inject(HttpClient);
 
-  private tokenCache: string | null = this.safeLocalGet(KEYS.token);
-  private emailCache: string = this.safeLocalGet(KEYS.email) || '';
-  private usuarioCache: UsuarioLocal | null = this.parseUsuario(this.safeLocalGet(KEYS.usuario));
+  private tokenCache: string | null = null;
+  private emailCache = '';
+  private usuarioCache: UsuarioLocal | null = null;
   private hydrated = false;
   private hydratePromise?: Promise<void>;
 
@@ -35,14 +35,9 @@ export class AuthService {
     return this.http
       .post<LoginResponse>(`${API_BASE_URL}/login/auth/login`, payload)
       .pipe(
-        tap((res) => {
-          this.tokenCache = res.access_token;
-          this.emailCache = payload.email;
-          void this.setPref(KEYS.token, res.access_token);
-          void this.setPref(KEYS.tokenType, res.token_type || 'Bearer');
-          void this.setPref(KEYS.email, payload.email);
-          // SEGURANÇA: NÃO armazenamos a senha. Se o token expirar -> login de novo.
-        })
+        switchMap((res) =>
+          from(this.saveSession(res, payload.email.trim())).pipe(map(() => res))
+        )
       );
   }
 
@@ -55,25 +50,32 @@ export class AuthService {
       Preferences.get({ key: KEYS.email }),
       Preferences.get({ key: KEYS.usuario })
     ]).then(([token, email, usuario]) => {
-      this.tokenCache = token.value || this.tokenCache;
-      this.emailCache = email.value || this.emailCache || '';
-      this.usuarioCache = this.parseUsuario(usuario.value) || this.usuarioCache;
+      this.tokenCache = token.value || this.safeLocalGet(KEYS.token);
+      this.emailCache = email.value || this.safeLocalGet(KEYS.email) || '';
+      this.usuarioCache = this.parseUsuario(usuario.value) || this.parseUsuario(this.safeLocalGet(KEYS.usuario));
       this.hydrated = true;
     }).catch(() => {
+      this.tokenCache = this.safeLocalGet(KEYS.token);
+      this.emailCache = this.safeLocalGet(KEYS.email) || '';
+      this.usuarioCache = this.parseUsuario(this.safeLocalGet(KEYS.usuario));
       this.hydrated = true;
     });
 
     return this.hydratePromise;
   }
 
-  getToken(): string | null { return this.tokenCache; }
+  getToken(): string | null {
+    return this.tokenCache;
+  }
 
   async getTokenAsync(): Promise<string | null> {
     await this.hydrate();
     return this.tokenCache;
   }
 
-  isLoggedIn(): boolean { return !!this.getToken(); }
+  isLoggedIn(): boolean {
+    return !!this.tokenCache;
+  }
 
   async isLoggedInAsync(): Promise<boolean> {
     return !!(await this.getTokenAsync());
@@ -83,34 +85,53 @@ export class AuthService {
     this.tokenCache = null;
     this.emailCache = '';
     this.usuarioCache = null;
+
     void Promise.all([
       Preferences.remove({ key: KEYS.token }),
       Preferences.remove({ key: KEYS.tokenType }),
       Preferences.remove({ key: KEYS.email }),
       Preferences.remove({ key: KEYS.usuario })
     ]);
+
     this.safeLocalRemove(KEYS.token);
     this.safeLocalRemove(KEYS.tokenType);
     this.safeLocalRemove(KEYS.email);
     this.safeLocalRemove(KEYS.usuario);
   }
 
-  getEmail(): string { return this.emailCache || ''; }
+  getEmail(): string {
+    return this.emailCache || '';
+  }
 
   setUsuarioLocal(u: UsuarioLocal): void {
     this.usuarioCache = u;
-    void this.setPref(KEYS.usuario, JSON.stringify(u));
+    void this.setPersisted(KEYS.usuario, JSON.stringify(u));
   }
 
-  getUsuarioLocal(): UsuarioLocal | null { return this.usuarioCache; }
+  getUsuarioLocal(): UsuarioLocal | null {
+    return this.usuarioCache;
+  }
 
   getNome(): string {
     return this.getUsuarioLocal()?.nome || 'Usuário';
   }
 
-  private async setPref(key: string, value: string): Promise<void> {
+  private async saveSession(res: LoginResponse, email: string): Promise<void> {
+    this.tokenCache = res.access_token;
+    this.emailCache = email;
+
+    await Promise.all([
+      this.setPersisted(KEYS.token, res.access_token),
+      this.setPersisted(KEYS.tokenType, res.token_type || 'Bearer'),
+      this.setPersisted(KEYS.email, email)
+    ]);
+
+    this.hydrated = true;
+  }
+
+  private async setPersisted(key: string, value: string): Promise<void> {
     await Preferences.set({ key, value });
-    this.safeLocalSet(key, value); // fallback web/compatibilidade
+    this.safeLocalSet(key, value); // fallback para web/PWA
   }
 
   private parseUsuario(raw: string | null): UsuarioLocal | null {
@@ -121,9 +142,11 @@ export class AuthService {
   private safeLocalGet(key: string): string | null {
     try { return localStorage.getItem(key); } catch { return null; }
   }
+
   private safeLocalSet(key: string, value: string): void {
     try { localStorage.setItem(key, value); } catch {}
   }
+
   private safeLocalRemove(key: string): void {
     try { localStorage.removeItem(key); } catch {}
   }
