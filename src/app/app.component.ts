@@ -2,11 +2,19 @@ import { Component, OnInit, inject } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { AuthService } from './core/auth.service';
 
+// 🔥 IMPORTA SEU MENU
+import { BottomNavComponent } from './components/bottom-nav/bottom-nav.component';
+
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet], // 👈 ESSA LINHA RESOLVE
-  template: '<router-outlet></router-outlet>'
+  imports: [RouterOutlet, BottomNavComponent],
+  template: `
+    <router-outlet></router-outlet>
+
+    <!-- 👇 menu fixo -->
+    <app-bottom-nav></app-bottom-nav>
+  `
 })
 export class AppComponent implements OnInit {
   private auth = inject(AuthService);
